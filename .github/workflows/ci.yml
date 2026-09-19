@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install ffmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          ffmpeg -hide_banner -encoders | grep -E 'libopus|aac'
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run typecheck
+
+      - run: npm test
+
+      # The published library is committed, so CI re-checks it rather than
+      # trusting it: schemas, content hashes, every audio file's SHA-256, and
+      # no orphans (SEC-2, SEC-10).
+      - name: Verify the published library
+        run: npm run pipeline -- verify
+
+      - name: Build the listener
+        run: npm run build:listener
+
+      - name: Install a browser for the smoke test
+        run: npx playwright install --with-deps chromium
+
+      - name: Smoke test in a real browser
+        run: |
+          npx vite preview --port 4173 --strictPort &
+          for i in $(seq 1 60); do
+            curl -sf -o /dev/null http://localhost:4173/refrain/ && break
+            sleep 1
+          done
+          node ../../scripts/smoke.mjs http://localhost:4173/refrain/ --shots ../../smoke-shots
+        working-directory: apps/listener
+
+      - name: Keep the screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-screenshots
+          path: smoke-shots/
+          if-no-files-found: ignore
+
+      # Advisory, not gating: a new advisory in a transitive dev dependency
+      # should be visible without blocking an unrelated change (SEC-9).
+      - name: Dependency audit
+        run: npm audit --omit=dev || true
