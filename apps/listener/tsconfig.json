@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "WebWorker"],
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "types": ["vite/client", "node"],
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "@refrain/catalogue": ["../../packages/catalogue/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "../../test/**/*.ts", "test/**/*.ts", "test/**/*.tsx", "vite.config.ts"]
+}

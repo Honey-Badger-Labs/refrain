@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!--
+      GitHub Pages cannot set response headers, so the policy travels in the
+      document. 'self' only: no CDN, no inline script, no third party.
+      `frame-ancestors`, `X-Frame-Options` and HSTS are ignored in a meta tag
+      and have to come from the edge; github.io already sends HSTS, and
+      docs/SECURITY-GATE.md records what a custom domain still has to add.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' blob:; connect-src 'self'; font-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="theme-color" content="#161826" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Refrain" />
+    <meta
+      name="description"
+      content="Public-domain poems, set to music and sung. A pre-rendered audio library that plays offline."
+    />
+    <title>Refrain</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  </head>
+  <body class="bg-night-950 text-slate-100 antialiased">
+    <div id="root"></div>
+    <noscript>
+      Refrain needs JavaScript to play its library. The texts themselves are public domain and can
+      be read anywhere.
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Refrain">
+  <rect width="512" height="512" rx="112" fill="#161826" />
+  <g fill="none" stroke-linecap="butt">
+    <!-- A refrain: the same phrase coming back. Three returning arcs. -->
+    <path d="M72 287a184 184 0 0 1 368 0" stroke="#e39a2f" stroke-width="26" />
+    <path d="M120 287a136 136 0 0 1 272 0" stroke="#6fb89e" stroke-width="20" opacity="0.85" />
+    <path d="M166 287a90 90 0 0 1 180 0" stroke="#9fd0be" stroke-width="16" opacity="0.7" />
+  </g>
+  <circle cx="256" cy="364" r="26" fill="#f0b357" />
+</svg>

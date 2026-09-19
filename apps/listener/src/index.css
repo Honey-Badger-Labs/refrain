@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    /* A quiet vertical wash so the night palette does not read as flat black. */
+    background-image: radial-gradient(120% 80% at 50% 0%, #1b1e30 0%, #0d0f18 62%);
+    background-attachment: fixed;
+  }
+
+  :focus-visible {
+    outline: 2px solid theme('colors.ember.400');
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-night-700/70 bg-night-900/70 backdrop-blur;
+  }
+
+  .pill {
+    @apply rounded-full px-3 py-1.5 text-sm font-medium transition-colors;
+  }
+
+  .pill-on {
+    @apply bg-ember-500 text-night-950;
+  }
+
+  .pill-off {
+    @apply bg-night-800 text-slate-300 hover:bg-night-700;
+  }
+}
