@@ -1,0 +1,4301 @@
+{
+  "schemaVersion": 1,
+  "corpus": {
+    "id": "blake-songs",
+    "title": "Songs of Innocence and of Experience",
+    "edition": "Text of the 1789 and 1794 illuminated printings, as reproduced in modern public-domain editions",
+    "author": "William Blake",
+    "year": 1794,
+    "licence": {
+      "id": "public-domain",
+      "name": "Public domain",
+      "note": "William Blake died in 1827, so the work and this text are out of copyright worldwide. No modern editor's apparatus, notes or emendations are included: only the poems themselves. Where printings differ in punctuation, the reading given here is the plain one, recorded so a later correction can be traced."
+    },
+    "sourceUrl": "https://www.gutenberg.org/ebooks/1934",
+    "description": "Ten short poems, the pilot corpus. Chosen over a 150-chapter book because short, metrical, strongly rhythmic text is the hardest case for word accuracy and the easiest case for a reviewer to judge quickly.",
+    "books": [
+      {
+        "id": "innocence",
+        "title": "Songs of Innocence",
+        "order": 0
+      },
+      {
+        "id": "experience",
+        "title": "Songs of Experience",
+        "order": 1
+      }
+    ]
+  },
+  "styles": [
+    {
+      "id": "folk",
+      "name": "Folk",
+      "description": "Brisker, four beats to the bar, a plucked accompaniment and a wider melody."
+    },
+    {
+      "id": "hymn",
+      "name": "Hymn",
+      "description": "Slow, three beats to the bar, sustained chords under a stepwise line."
+    }
+  ],
+  "voices": [
+    {
+      "id": "alto",
+      "name": "Alto",
+      "source": "synthetic: additive synthesis in this repository, no human voice sampled or modelled",
+      "description": "Lower register, warmer harmonics."
+    },
+    {
+      "id": "treble",
+      "name": "Treble",
+      "source": "synthetic: additive synthesis in this repository, no human voice sampled or modelled",
+      "description": "An octave up, brighter."
+    }
+  ],
+  "presets": [
+    {
+      "id": "folk-alto",
+      "mode": "sung",
+      "styleId": "folk",
+      "voiceId": "alto",
+      "adapter": "synth",
+      "params": {
+        "tempoScale": 1
+      },
+      "modelId": "refrain-synth"
+    },
+    {
+      "id": "folk-treble",
+      "mode": "sung",
+      "styleId": "folk",
+      "voiceId": "treble",
+      "adapter": "synth",
+      "params": {
+        "tempoScale": 0.96
+      },
+      "modelId": "refrain-synth"
+    },
+    {
+      "id": "hymn-alto",
+      "mode": "sung",
+      "styleId": "hymn",
+      "voiceId": "alto",
+      "adapter": "synth",
+      "params": {
+        "tempoScale": 1
+      },
+      "modelId": "refrain-synth"
+    },
+    {
+      "id": "hymn-treble",
+      "mode": "sung",
+      "styleId": "hymn",
+      "voiceId": "treble",
+      "adapter": "synth",
+      "params": {
+        "tempoScale": 1.05
+      },
+      "modelId": "refrain-synth"
+    }
+  ],
+  "chunks": [
+    {
+      "id": "the-sick-rose",
+      "corpusId": "blake-songs",
+      "bookId": "experience",
+      "number": 1,
+      "title": "The Sick Rose",
+      "lines": [
+        "O Rose, thou art sick!",
+        "The invisible worm",
+        "That flies in the night,",
+        "In the howling storm,",
+        "Has found out thy bed",
+        "Of crimson joy,",
+        "And his dark secret love",
+        "Does thy life destroy."
+      ]
+    },
+    {
+      "id": "the-tyger",
+      "corpusId": "blake-songs",
+      "bookId": "experience",
+      "number": 2,
+      "title": "The Tyger",
+      "lines": [
+        "Tyger Tyger, burning bright,",
+        "In the forests of the night;",
+        "What immortal hand or eye,",
+        "Could frame thy fearful symmetry?",
+        "In what distant deeps or skies",
+        "Burnt the fire of thine eyes?",
+        "On what wings dare he aspire?",
+        "What the hand dare seize the fire?",
+        "And what shoulder, and what art,",
+        "Could twist the sinews of thy heart?",
+        "And when thy heart began to beat,",
+        "What dread hand and what dread feet?",
+        "What the hammer? what the chain,",
+        "In what furnace was thy brain?",
+        "What the anvil? what dread grasp",
+        "Dare its deadly terrors clasp?",
+        "When the stars threw down their spears",
+        "And water'd heaven with their tears,",
+        "Did he smile his work to see?",
+        "Did he who made the Lamb make thee?",
+        "Tyger Tyger, burning bright,",
+        "In the forests of the night,",
+        "What immortal hand or eye",
+        "Dare frame thy fearful symmetry?"
+      ]
+    },
+    {
+      "id": "ah-sun-flower",
+      "corpusId": "blake-songs",
+      "bookId": "experience",
+      "number": 3,
+      "title": "Ah! Sun-flower",
+      "lines": [
+        "Ah, Sun-flower! weary of time,",
+        "Who countest the steps of the Sun,",
+        "Seeking after that sweet golden clime",
+        "Where the traveller's journey is done;",
+        "Where the Youth pined away with desire,",
+        "And the pale Virgin shrouded in snow,",
+        "Arise from their graves, and aspire",
+        "Where my Sun-flower wishes to go."
+      ]
+    },
+    {
+      "id": "london",
+      "corpusId": "blake-songs",
+      "bookId": "experience",
+      "number": 4,
+      "title": "London",
+      "lines": [
+        "I wander thro' each charter'd street,",
+        "Near where the charter'd Thames does flow,",
+        "And mark in every face I meet",
+        "Marks of weakness, marks of woe.",
+        "In every cry of every Man,",
+        "In every Infant's cry of fear,",
+        "In every voice, in every ban,",
+        "The mind-forg'd manacles I hear.",
+        "How the Chimney-sweeper's cry",
+        "Every black'ning Church appalls;",
+        "And the hapless Soldier's sigh",
+        "Runs in blood down Palace walls.",
+        "But most thro' midnight streets I hear",
+        "How the youthful Harlot's curse",
+        "Blasts the new-born Infant's tear,",
+        "And blights with plagues the Marriage hearse."
+      ]
+    },
+    {
+      "id": "introduction",
+      "corpusId": "blake-songs",
+      "bookId": "innocence",
+      "number": 1,
+      "title": "Introduction",
+      "lines": [
+        "Piping down the valleys wild,",
+        "Piping songs of pleasant glee,",
+        "On a cloud I saw a child,",
+        "And he laughing said to me:",
+        "\"Pipe a song about a Lamb!\"",
+        "So I piped with merry cheer.",
+        "\"Piper, pipe that song again;\"",
+        "So I piped: he wept to hear.",
+        "\"Drop thy pipe, thy happy pipe;",
+        "Sing thy songs of happy cheer!\"",
+        "So I sung the same again,",
+        "While he wept with joy to hear.",
+        "\"Piper, sit thee down and write",
+        "In a book, that all may read.\"",
+        "So he vanish'd from my sight;",
+        "And I pluck'd a hollow reed,",
+        "And I made a rural pen,",
+        "And I stain'd the water clear,",
+        "And I wrote my happy songs",
+        "Every child may joy to hear."
+      ]
+    },
+    {
+      "id": "the-shepherd",
+      "corpusId": "blake-songs",
+      "bookId": "innocence",
+      "number": 2,
+      "title": "The Shepherd",
+      "lines": [
+        "How sweet is the Shepherd's sweet lot!",
+        "From the morn to the evening he strays;",
+        "He shall follow his sheep all the day,",
+        "And his tongue shall be filled with praise.",
+        "For he hears the lambs' innocent call,",
+        "And he hears the ewes' tender reply;",
+        "He is watchful while they are in peace,",
+        "For they know when their Shepherd is nigh."
+      ]
+    },
+    {
+      "id": "the-lamb",
+      "corpusId": "blake-songs",
+      "bookId": "innocence",
+      "number": 3,
+      "title": "The Lamb",
+      "lines": [
+        "Little Lamb, who made thee?",
+        "Dost thou know who made thee?",
+        "Gave thee life, and bid thee feed",
+        "By the stream and o'er the mead;",
+        "Gave thee clothing of delight,",
+        "Softest clothing, woolly, bright;",
+        "Gave thee such a tender voice,",
+        "Making all the vales rejoice?",
+        "Little Lamb, who made thee?",
+        "Dost thou know who made thee?",
+        "Little Lamb, I'll tell thee,",
+        "Little Lamb, I'll tell thee:",
+        "He is called by thy name,",
+        "For He calls Himself a Lamb.",
+        "He is meek, and He is mild;",
+        "He became a little child.",
+        "I a child, and thou a lamb,",
+        "We are called by His name.",
+        "Little Lamb, God bless thee!",
+        "Little Lamb, God bless thee!"
+      ]
+    },
+    {
+      "id": "the-blossom",
+      "corpusId": "blake-songs",
+      "bookId": "innocence",
+      "number": 4,
+      "title": "The Blossom",
+      "lines": [
+        "Merry, merry sparrow!",
+        "Under leaves so green",
+        "A happy blossom",
+        "Sees you, swift as arrow,",
+        "Seek your cradle narrow,",
+        "Near my bosom.",
+        "Pretty, pretty robin!",
+        "Under leaves so green",
+        "A happy blossom",
+        "Hears you sobbing, sobbing,",
+        "Pretty, pretty robin,",
+        "Near my bosom."
+      ]
+    },
+    {
+      "id": "nurses-song",
+      "corpusId": "blake-songs",
+      "bookId": "innocence",
+      "number": 5,
+      "title": "Nurse's Song",
+      "lines": [
+        "When the voices of children are heard on the green,",
+        "And laughing is heard on the hill,",
+        "My heart is at rest within my breast,",
+        "And everything else is still.",
+        "\"Then come home, my children, the sun is gone down,",
+        "And the dews of night arise;",
+        "Come, come, leave off play, and let us away,",
+        "Till the morning appears in the skies.\"",
+        "\"No, no, let us play, for it is yet day,",
+        "And we cannot go to sleep;",
+        "Besides, in the sky the little birds fly,",
+        "And the hills are all cover'd with sheep.\"",
+        "\"Well, well, go and play till the light fades away,",
+        "And then go home to bed.\"",
+        "The little ones leaped, and shouted, and laugh'd,",
+        "And all the hills echoed."
+      ]
+    },
+    {
+      "id": "infant-joy",
+      "corpusId": "blake-songs",
+      "bookId": "innocence",
+      "number": 6,
+      "title": "Infant Joy",
+      "lines": [
+        "\"I have no name;",
+        "I am but two days old.\"",
+        "What shall I call thee?",
+        "\"I happy am,",
+        "Joy is my name.\"",
+        "Sweet joy befall thee!",
+        "Pretty joy!",
+        "Sweet joy, but two days old.",
+        "Sweet joy I call thee:",
+        "Thou dost smile,",
+        "I sing the while;",
+        "Sweet joy befall thee!"
+      ]
+    }
+  ],
+  "tracks": [
+    {
+      "id": "ah-sun-flower--folk-alto",
+      "chunkId": "ah-sun-flower",
+      "presetId": "folk-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/ah-sun-flower/folk-alto.4572e3045b9df341.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 175690,
+          "sha256": "4572e3045b9df341336e12c9d35f8c0e6baea1dcb90e25449c07e5e564a8a6c5"
+        },
+        {
+          "path": "library/blake-songs/ah-sun-flower/folk-alto.3f0ac69747c49c9c.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 249321,
+          "sha256": "3f0ac69747c49c9ccd111ceb0a223795fdfdafdd9fcc9d6ed19a2fde1bd0cfab"
+        }
+      ],
+      "durationSeconds": 39.907,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.071,
+          "end": 4.792
+        },
+        {
+          "lineIndex": 1,
+          "start": 5.328,
+          "end": 9.048
+        },
+        {
+          "lineIndex": 2,
+          "start": 9.584,
+          "end": 13.754
+        },
+        {
+          "lineIndex": 3,
+          "start": 14.29,
+          "end": 18.461
+        },
+        {
+          "lineIndex": 4,
+          "start": 18.996,
+          "end": 23.569
+        },
+        {
+          "lineIndex": 5,
+          "start": 24.104,
+          "end": 28.275
+        },
+        {
+          "lineIndex": 6,
+          "start": 28.811,
+          "end": 32.981
+        },
+        {
+          "lineIndex": 7,
+          "start": 33.517,
+          "end": 37.688
+        }
+      ]
+    },
+    {
+      "id": "ah-sun-flower--folk-treble",
+      "chunkId": "ah-sun-flower",
+      "presetId": "folk-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/ah-sun-flower/folk-treble.a9cc15cb9571aa79.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 193980,
+          "sha256": "a9cc15cb9571aa794d5900ed868555a74700163d05f16adf6ea87e44f2767588"
+        },
+        {
+          "path": "library/blake-songs/ah-sun-flower/folk-treble.147dfd772b74d9bd.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 259528,
+          "sha256": "147dfd772b74d9bd5df301f2fdd3a5d9f6d4750f4cd61c49b20d2e7d7cc80bb3"
+        }
+      ],
+      "durationSeconds": 41.507,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.116,
+          "end": 4.992
+        },
+        {
+          "lineIndex": 1,
+          "start": 5.55,
+          "end": 9.425
+        },
+        {
+          "lineIndex": 2,
+          "start": 9.983,
+          "end": 14.328
+        },
+        {
+          "lineIndex": 3,
+          "start": 14.886,
+          "end": 19.23
+        },
+        {
+          "lineIndex": 4,
+          "start": 19.788,
+          "end": 24.551
+        },
+        {
+          "lineIndex": 5,
+          "start": 25.109,
+          "end": 29.453
+        },
+        {
+          "lineIndex": 6,
+          "start": 30.011,
+          "end": 34.355
+        },
+        {
+          "lineIndex": 7,
+          "start": 34.914,
+          "end": 39.258
+        }
+      ]
+    },
+    {
+      "id": "ah-sun-flower--hymn-alto",
+      "chunkId": "ah-sun-flower",
+      "presetId": "hymn-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/ah-sun-flower/hymn-alto.51c2af6029fe0eaa.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 215868,
+          "sha256": "51c2af6029fe0eaa226d788b620ddd8458703fa231ec52e5fc3150a9978531f5"
+        },
+        {
+          "path": "library/blake-songs/ah-sun-flower/hymn-alto.4dac9f93ccf864a7.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 327531,
+          "sha256": "4dac9f93ccf864a7ba60bd310ff6758e5c6d983cb026f2346a645e1395446cdb"
+        }
+      ],
+      "durationSeconds": 52.507,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.463,
+          "end": 6.348
+        },
+        {
+          "lineIndex": 1,
+          "start": 7.079,
+          "end": 11.963
+        },
+        {
+          "lineIndex": 2,
+          "start": 12.695,
+          "end": 18.128
+        },
+        {
+          "lineIndex": 3,
+          "start": 18.86,
+          "end": 24.293
+        },
+        {
+          "lineIndex": 4,
+          "start": 25.024,
+          "end": 31.006
+        },
+        {
+          "lineIndex": 5,
+          "start": 31.738,
+          "end": 37.171
+        },
+        {
+          "lineIndex": 6,
+          "start": 37.902,
+          "end": 43.335
+        },
+        {
+          "lineIndex": 7,
+          "start": 44.067,
+          "end": 49.5
+        }
+      ]
+    },
+    {
+      "id": "ah-sun-flower--hymn-treble",
+      "chunkId": "ah-sun-flower",
+      "presetId": "hymn-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/ah-sun-flower/hymn-treble.35373a4e96147fa1.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 230146,
+          "sha256": "35373a4e96147fa1c47176242a47adcbe8ade0fc035ee25a9b018fb4af06d0d1"
+        },
+        {
+          "path": "library/blake-songs/ah-sun-flower/hymn-treble.2191eb2058536714.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 312318,
+          "sha256": "2191eb2058536714c3ff550bd94413acac0c6930267bf1fe661a8ec28d95ce22"
+        }
+      ],
+      "durationSeconds": 50.007,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.394,
+          "end": 6.045
+        },
+        {
+          "lineIndex": 1,
+          "start": 6.742,
+          "end": 11.394
+        },
+        {
+          "lineIndex": 2,
+          "start": 12.091,
+          "end": 17.265
+        },
+        {
+          "lineIndex": 3,
+          "start": 17.962,
+          "end": 23.136
+        },
+        {
+          "lineIndex": 4,
+          "start": 23.833,
+          "end": 29.53
+        },
+        {
+          "lineIndex": 5,
+          "start": 30.226,
+          "end": 35.401
+        },
+        {
+          "lineIndex": 6,
+          "start": 36.098,
+          "end": 41.272
+        },
+        {
+          "lineIndex": 7,
+          "start": 41.969,
+          "end": 47.143
+        }
+      ]
+    },
+    {
+      "id": "infant-joy--folk-alto",
+      "chunkId": "infant-joy",
+      "presetId": "folk-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/infant-joy/folk-alto.e1032ed41e01b9e2.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 157214,
+          "sha256": "e1032ed41e01b9e28896f5977443d5e4497905f5d1f0697f9e8fec67591b391d"
+        },
+        {
+          "path": "library/blake-songs/infant-joy/folk-alto.02e085b73ea779d0.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 225092,
+          "sha256": "02e085b73ea779d08a27ff222a3ea38518e60b6be4d9286d3362c48d6070129c"
+        }
+      ],
+      "durationSeconds": 36.107,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.071,
+          "end": 3.088
+        },
+        {
+          "lineIndex": 1,
+          "start": 3.624,
+          "end": 6.493
+        },
+        {
+          "lineIndex": 2,
+          "start": 7.029,
+          "end": 9.496
+        },
+        {
+          "lineIndex": 3,
+          "start": 10.031,
+          "end": 12.048
+        },
+        {
+          "lineIndex": 4,
+          "start": 12.584,
+          "end": 14.601
+        },
+        {
+          "lineIndex": 5,
+          "start": 15.137,
+          "end": 17.604
+        },
+        {
+          "lineIndex": 6,
+          "start": 18.139,
+          "end": 19.754
+        },
+        {
+          "lineIndex": 7,
+          "start": 20.29,
+          "end": 23.159
+        },
+        {
+          "lineIndex": 8,
+          "start": 23.695,
+          "end": 26.162
+        },
+        {
+          "lineIndex": 9,
+          "start": 26.697,
+          "end": 28.312
+        },
+        {
+          "lineIndex": 10,
+          "start": 28.848,
+          "end": 30.865
+        },
+        {
+          "lineIndex": 11,
+          "start": 31.401,
+          "end": 33.868
+        }
+      ]
+    },
+    {
+      "id": "infant-joy--folk-treble",
+      "chunkId": "infant-joy",
+      "presetId": "folk-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/infant-joy/folk-treble.31462ffd7de6c3ad.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 175118,
+          "sha256": "31462ffd7de6c3ad9b9f244ffe266f3823a57d3b7e2f18dee08c75a52548adf7"
+        },
+        {
+          "path": "library/blake-songs/infant-joy/folk-treble.8afa0aa6be7f8185.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 235141,
+          "sha256": "8afa0aa6be7f81854b0daf25fbf2625715f177fa23dea7a5a15fb5590e99b405"
+        }
+      ],
+      "durationSeconds": 37.607,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.116,
+          "end": 3.217
+        },
+        {
+          "lineIndex": 1,
+          "start": 3.775,
+          "end": 6.763
+        },
+        {
+          "lineIndex": 2,
+          "start": 7.321,
+          "end": 9.891
+        },
+        {
+          "lineIndex": 3,
+          "start": 10.449,
+          "end": 12.55
+        },
+        {
+          "lineIndex": 4,
+          "start": 13.108,
+          "end": 15.209
+        },
+        {
+          "lineIndex": 5,
+          "start": 15.767,
+          "end": 18.337
+        },
+        {
+          "lineIndex": 6,
+          "start": 18.895,
+          "end": 20.578
+        },
+        {
+          "lineIndex": 7,
+          "start": 21.136,
+          "end": 24.124
+        },
+        {
+          "lineIndex": 8,
+          "start": 24.682,
+          "end": 27.252
+        },
+        {
+          "lineIndex": 9,
+          "start": 27.81,
+          "end": 29.492
+        },
+        {
+          "lineIndex": 10,
+          "start": 30.05,
+          "end": 32.151
+        },
+        {
+          "lineIndex": 11,
+          "start": 32.709,
+          "end": 35.279
+        }
+      ]
+    },
+    {
+      "id": "infant-joy--hymn-alto",
+      "chunkId": "infant-joy",
+      "presetId": "hymn-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/infant-joy/hymn-alto.9d458e54fff198b9.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 196092,
+          "sha256": "9d458e54fff198b90f0d83145e608a44a0ea50ea29cb7436f4a6760180ccbf44"
+        },
+        {
+          "path": "library/blake-songs/infant-joy/hymn-alto.cf058af6d2d3f581.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 300544,
+          "sha256": "cf058af6d2d3f581513e533473c325e5d2cf6eacd01025685e85dfaa2939f81c"
+        }
+      ],
+      "durationSeconds": 48.008,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.463,
+          "end": 4.152
+        },
+        {
+          "lineIndex": 1,
+          "start": 4.884,
+          "end": 8.671
+        },
+        {
+          "lineIndex": 2,
+          "start": 9.402,
+          "end": 12.64
+        },
+        {
+          "lineIndex": 3,
+          "start": 13.372,
+          "end": 16.061
+        },
+        {
+          "lineIndex": 4,
+          "start": 16.793,
+          "end": 19.482
+        },
+        {
+          "lineIndex": 5,
+          "start": 20.213,
+          "end": 23.451
+        },
+        {
+          "lineIndex": 6,
+          "start": 24.183,
+          "end": 26.323
+        },
+        {
+          "lineIndex": 7,
+          "start": 27.055,
+          "end": 30.841
+        },
+        {
+          "lineIndex": 8,
+          "start": 31.573,
+          "end": 34.811
+        },
+        {
+          "lineIndex": 9,
+          "start": 35.543,
+          "end": 37.683
+        },
+        {
+          "lineIndex": 10,
+          "start": 38.415,
+          "end": 41.104
+        },
+        {
+          "lineIndex": 11,
+          "start": 41.835,
+          "end": 45.073
+        }
+      ]
+    },
+    {
+      "id": "infant-joy--hymn-treble",
+      "chunkId": "infant-joy",
+      "presetId": "hymn-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/infant-joy/hymn-treble.442420d84e27f172.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 208995,
+          "sha256": "442420d84e27f17275845636b762e425a111c7bdcb5080db9c8fbd8a0d334ea9"
+        },
+        {
+          "path": "library/blake-songs/infant-joy/hymn-treble.cc059e66eed34c5d.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 286696,
+          "sha256": "cc059e66eed34c5d5ef720c39f704e5dad599233095767bac6912348c1635275"
+        }
+      ],
+      "durationSeconds": 45.807,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.394,
+          "end": 3.955
+        },
+        {
+          "lineIndex": 1,
+          "start": 4.652,
+          "end": 8.258
+        },
+        {
+          "lineIndex": 2,
+          "start": 8.955,
+          "end": 12.038
+        },
+        {
+          "lineIndex": 3,
+          "start": 12.735,
+          "end": 15.296
+        },
+        {
+          "lineIndex": 4,
+          "start": 15.993,
+          "end": 18.554
+        },
+        {
+          "lineIndex": 5,
+          "start": 19.251,
+          "end": 22.334
+        },
+        {
+          "lineIndex": 6,
+          "start": 23.031,
+          "end": 25.07
+        },
+        {
+          "lineIndex": 7,
+          "start": 25.767,
+          "end": 29.373
+        },
+        {
+          "lineIndex": 8,
+          "start": 30.07,
+          "end": 33.153
+        },
+        {
+          "lineIndex": 9,
+          "start": 33.85,
+          "end": 35.889
+        },
+        {
+          "lineIndex": 10,
+          "start": 36.585,
+          "end": 39.146
+        },
+        {
+          "lineIndex": 11,
+          "start": 39.843,
+          "end": 42.927
+        }
+      ]
+    },
+    {
+      "id": "introduction--folk-alto",
+      "chunkId": "introduction",
+      "presetId": "folk-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/introduction/folk-alto.57c98746d078c7f9.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 360824,
+          "sha256": "57c98746d078c7f9e235646b9bb8f5de2ab70e53ae13699f76fb881f5e93e6db"
+        },
+        {
+          "path": "library/blake-songs/introduction/folk-alto.586bd93af77bf5d2.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 505199,
+          "sha256": "586bd93af77bf5d23d7321733a2fdecdf072c9ecd2918c5f61f007e70ae6298a"
+        }
+      ],
+      "durationSeconds": 81.007,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.071,
+          "end": 4.39
+        },
+        {
+          "lineIndex": 1,
+          "start": 4.926,
+          "end": 8.245
+        },
+        {
+          "lineIndex": 2,
+          "start": 8.78,
+          "end": 12.099
+        },
+        {
+          "lineIndex": 3,
+          "start": 12.635,
+          "end": 15.954
+        },
+        {
+          "lineIndex": 4,
+          "start": 16.489,
+          "end": 19.808
+        },
+        {
+          "lineIndex": 5,
+          "start": 20.344,
+          "end": 24.064
+        },
+        {
+          "lineIndex": 6,
+          "start": 24.6,
+          "end": 27.919
+        },
+        {
+          "lineIndex": 7,
+          "start": 28.454,
+          "end": 32.175
+        },
+        {
+          "lineIndex": 8,
+          "start": 32.711,
+          "end": 36.029
+        },
+        {
+          "lineIndex": 9,
+          "start": 36.565,
+          "end": 39.884
+        },
+        {
+          "lineIndex": 10,
+          "start": 40.42,
+          "end": 43.738
+        },
+        {
+          "lineIndex": 11,
+          "start": 44.274,
+          "end": 47.593
+        },
+        {
+          "lineIndex": 12,
+          "start": 48.129,
+          "end": 51.447
+        },
+        {
+          "lineIndex": 13,
+          "start": 51.983,
+          "end": 55.302
+        },
+        {
+          "lineIndex": 14,
+          "start": 55.838,
+          "end": 59.156
+        },
+        {
+          "lineIndex": 15,
+          "start": 59.692,
+          "end": 63.011
+        },
+        {
+          "lineIndex": 16,
+          "start": 63.546,
+          "end": 66.865
+        },
+        {
+          "lineIndex": 17,
+          "start": 67.401,
+          "end": 70.72
+        },
+        {
+          "lineIndex": 18,
+          "start": 71.255,
+          "end": 74.574
+        },
+        {
+          "lineIndex": 19,
+          "start": 75.11,
+          "end": 78.83
+        }
+      ]
+    },
+    {
+      "id": "introduction--folk-treble",
+      "chunkId": "introduction",
+      "presetId": "folk-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/introduction/folk-treble.437927fa39e3ed2d.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 399473,
+          "sha256": "437927fa39e3ed2d5f75021743092a84ecf1e47805b06615d50fb13f68131e0e"
+        },
+        {
+          "path": "library/blake-songs/introduction/folk-treble.5c2d0beb2ed51166.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 527291,
+          "sha256": "5c2d0beb2ed51166c152028890337665f428b869e48776d7d68d2a1a29285107"
+        }
+      ],
+      "durationSeconds": 84.407,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.116,
+          "end": 4.573
+        },
+        {
+          "lineIndex": 1,
+          "start": 5.131,
+          "end": 8.588
+        },
+        {
+          "lineIndex": 2,
+          "start": 9.146,
+          "end": 12.603
+        },
+        {
+          "lineIndex": 3,
+          "start": 13.161,
+          "end": 16.618
+        },
+        {
+          "lineIndex": 4,
+          "start": 17.176,
+          "end": 20.633
+        },
+        {
+          "lineIndex": 5,
+          "start": 21.191,
+          "end": 25.067
+        },
+        {
+          "lineIndex": 6,
+          "start": 25.625,
+          "end": 29.082
+        },
+        {
+          "lineIndex": 7,
+          "start": 29.64,
+          "end": 33.516
+        },
+        {
+          "lineIndex": 8,
+          "start": 34.074,
+          "end": 37.531
+        },
+        {
+          "lineIndex": 9,
+          "start": 38.089,
+          "end": 41.546
+        },
+        {
+          "lineIndex": 10,
+          "start": 42.104,
+          "end": 45.561
+        },
+        {
+          "lineIndex": 11,
+          "start": 46.119,
+          "end": 49.576
+        },
+        {
+          "lineIndex": 12,
+          "start": 50.134,
+          "end": 53.591
+        },
+        {
+          "lineIndex": 13,
+          "start": 54.149,
+          "end": 57.606
+        },
+        {
+          "lineIndex": 14,
+          "start": 58.164,
+          "end": 61.621
+        },
+        {
+          "lineIndex": 15,
+          "start": 62.179,
+          "end": 65.636
+        },
+        {
+          "lineIndex": 16,
+          "start": 66.194,
+          "end": 69.651
+        },
+        {
+          "lineIndex": 17,
+          "start": 70.209,
+          "end": 73.666
+        },
+        {
+          "lineIndex": 18,
+          "start": 74.224,
+          "end": 77.681
+        },
+        {
+          "lineIndex": 19,
+          "start": 78.239,
+          "end": 82.115
+        }
+      ]
+    },
+    {
+      "id": "introduction--hymn-alto",
+      "chunkId": "introduction",
+      "presetId": "hymn-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/introduction/hymn-alto.378f2621ec3ae8d1.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 436369,
+          "sha256": "378f2621ec3ae8d1a5957b9a3f7243ff92327390a9c16b6498add628362e001b"
+        },
+        {
+          "path": "library/blake-songs/introduction/hymn-alto.7151b8ede7384044.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 665102,
+          "sha256": "7151b8ede73840440cf3e05784c9493aa089eb5e3319298d1ff55e8f7dc8c7de"
+        }
+      ],
+      "durationSeconds": 106.707,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.463,
+          "end": 5.799
+        },
+        {
+          "lineIndex": 1,
+          "start": 6.53,
+          "end": 10.866
+        },
+        {
+          "lineIndex": 2,
+          "start": 11.598,
+          "end": 15.933
+        },
+        {
+          "lineIndex": 3,
+          "start": 16.665,
+          "end": 21
+        },
+        {
+          "lineIndex": 4,
+          "start": 21.732,
+          "end": 26.067
+        },
+        {
+          "lineIndex": 5,
+          "start": 26.799,
+          "end": 31.683
+        },
+        {
+          "lineIndex": 6,
+          "start": 32.415,
+          "end": 36.75
+        },
+        {
+          "lineIndex": 7,
+          "start": 37.482,
+          "end": 42.366
+        },
+        {
+          "lineIndex": 8,
+          "start": 43.098,
+          "end": 47.433
+        },
+        {
+          "lineIndex": 9,
+          "start": 48.165,
+          "end": 52.5
+        },
+        {
+          "lineIndex": 10,
+          "start": 53.232,
+          "end": 57.567
+        },
+        {
+          "lineIndex": 11,
+          "start": 58.299,
+          "end": 62.634
+        },
+        {
+          "lineIndex": 12,
+          "start": 63.366,
+          "end": 67.701
+        },
+        {
+          "lineIndex": 13,
+          "start": 68.433,
+          "end": 72.768
+        },
+        {
+          "lineIndex": 14,
+          "start": 73.5,
+          "end": 77.835
+        },
+        {
+          "lineIndex": 15,
+          "start": 78.567,
+          "end": 82.902
+        },
+        {
+          "lineIndex": 16,
+          "start": 83.634,
+          "end": 87.97
+        },
+        {
+          "lineIndex": 17,
+          "start": 88.701,
+          "end": 93.037
+        },
+        {
+          "lineIndex": 18,
+          "start": 93.768,
+          "end": 98.104
+        },
+        {
+          "lineIndex": 19,
+          "start": 98.835,
+          "end": 103.72
+        }
+      ]
+    },
+    {
+      "id": "introduction--hymn-treble",
+      "chunkId": "introduction",
+      "presetId": "hymn-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/introduction/hymn-treble.75ce26b68dafa76a.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 463346,
+          "sha256": "75ce26b68dafa76af72a627059197d99a91e8eef79982c35c82289dd676d8562"
+        },
+        {
+          "path": "library/blake-songs/introduction/hymn-treble.4877c9ff23e503ce.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 634244,
+          "sha256": "4877c9ff23e503ce997a4bce97d4a1ff525f35455eb1f7d78ca64f71df7efee2"
+        }
+      ],
+      "durationSeconds": 101.607,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.394,
+          "end": 5.523
+        },
+        {
+          "lineIndex": 1,
+          "start": 6.22,
+          "end": 10.348
+        },
+        {
+          "lineIndex": 2,
+          "start": 11.045,
+          "end": 15.174
+        },
+        {
+          "lineIndex": 3,
+          "start": 15.871,
+          "end": 20
+        },
+        {
+          "lineIndex": 4,
+          "start": 20.697,
+          "end": 24.826
+        },
+        {
+          "lineIndex": 5,
+          "start": 25.523,
+          "end": 30.174
+        },
+        {
+          "lineIndex": 6,
+          "start": 30.871,
+          "end": 35
+        },
+        {
+          "lineIndex": 7,
+          "start": 35.697,
+          "end": 40.348
+        },
+        {
+          "lineIndex": 8,
+          "start": 41.045,
+          "end": 45.174
+        },
+        {
+          "lineIndex": 9,
+          "start": 45.871,
+          "end": 50
+        },
+        {
+          "lineIndex": 10,
+          "start": 50.697,
+          "end": 54.826
+        },
+        {
+          "lineIndex": 11,
+          "start": 55.523,
+          "end": 59.652
+        },
+        {
+          "lineIndex": 12,
+          "start": 60.348,
+          "end": 64.477
+        },
+        {
+          "lineIndex": 13,
+          "start": 65.174,
+          "end": 69.303
+        },
+        {
+          "lineIndex": 14,
+          "start": 70,
+          "end": 74.129
+        },
+        {
+          "lineIndex": 15,
+          "start": 74.826,
+          "end": 78.955
+        },
+        {
+          "lineIndex": 16,
+          "start": 79.652,
+          "end": 83.78
+        },
+        {
+          "lineIndex": 17,
+          "start": 84.477,
+          "end": 88.606
+        },
+        {
+          "lineIndex": 18,
+          "start": 89.303,
+          "end": 93.432
+        },
+        {
+          "lineIndex": 19,
+          "start": 94.129,
+          "end": 98.78
+        }
+      ]
+    },
+    {
+      "id": "london--folk-alto",
+      "chunkId": "london",
+      "presetId": "folk-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/london/folk-alto.f26060317eeaf998.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 321328,
+          "sha256": "f26060317eeaf998295bbf07a25f5547f66a0d8929b6be8d5cd3b87c97d3b692"
+        },
+        {
+          "path": "library/blake-songs/london/folk-alto.ffbb495e88b9753f.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 451672,
+          "sha256": "ffbb495e88b9753ff8ff3555c18f7ea1f46a75665b31f8d0db1ca89e471cf7bf"
+        }
+      ],
+      "durationSeconds": 72.407,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.071,
+          "end": 4.792
+        },
+        {
+          "lineIndex": 1,
+          "start": 5.328,
+          "end": 9.498
+        },
+        {
+          "lineIndex": 2,
+          "start": 10.034,
+          "end": 14.204
+        },
+        {
+          "lineIndex": 3,
+          "start": 14.74,
+          "end": 18.059
+        },
+        {
+          "lineIndex": 4,
+          "start": 18.595,
+          "end": 23.167
+        },
+        {
+          "lineIndex": 5,
+          "start": 23.703,
+          "end": 27.873
+        },
+        {
+          "lineIndex": 6,
+          "start": 28.409,
+          "end": 32.981
+        },
+        {
+          "lineIndex": 7,
+          "start": 33.517,
+          "end": 37.688
+        },
+        {
+          "lineIndex": 8,
+          "start": 38.223,
+          "end": 41.542
+        },
+        {
+          "lineIndex": 9,
+          "start": 42.078,
+          "end": 45.798
+        },
+        {
+          "lineIndex": 10,
+          "start": 46.334,
+          "end": 49.653
+        },
+        {
+          "lineIndex": 11,
+          "start": 50.188,
+          "end": 53.507
+        },
+        {
+          "lineIndex": 12,
+          "start": 54.043,
+          "end": 57.763
+        },
+        {
+          "lineIndex": 13,
+          "start": 58.299,
+          "end": 61.618
+        },
+        {
+          "lineIndex": 14,
+          "start": 62.154,
+          "end": 65.472
+        },
+        {
+          "lineIndex": 15,
+          "start": 66.008,
+          "end": 70.179
+        }
+      ]
+    },
+    {
+      "id": "london--folk-treble",
+      "chunkId": "london",
+      "presetId": "folk-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/london/folk-treble.fcfd1ca412980c23.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 359367,
+          "sha256": "fcfd1ca412980c2314c9d7391c60923dc0ed2ad687183c9e17a933f3d3b18058"
+        },
+        {
+          "path": "library/blake-songs/london/folk-treble.fc3ac4b5aee3526d.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 471355,
+          "sha256": "fc3ac4b5aee3526d12e1846ddbe9b1b8c43f33950e36f4bcf5d1945b4ea88ff6"
+        }
+      ],
+      "durationSeconds": 75.407,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.116,
+          "end": 4.992
+        },
+        {
+          "lineIndex": 1,
+          "start": 5.55,
+          "end": 9.894
+        },
+        {
+          "lineIndex": 2,
+          "start": 10.452,
+          "end": 14.796
+        },
+        {
+          "lineIndex": 3,
+          "start": 15.354,
+          "end": 18.811
+        },
+        {
+          "lineIndex": 4,
+          "start": 19.369,
+          "end": 24.132
+        },
+        {
+          "lineIndex": 5,
+          "start": 24.69,
+          "end": 29.035
+        },
+        {
+          "lineIndex": 6,
+          "start": 29.593,
+          "end": 34.355
+        },
+        {
+          "lineIndex": 7,
+          "start": 34.914,
+          "end": 39.258
+        },
+        {
+          "lineIndex": 8,
+          "start": 39.816,
+          "end": 43.273
+        },
+        {
+          "lineIndex": 9,
+          "start": 43.831,
+          "end": 47.706
+        },
+        {
+          "lineIndex": 10,
+          "start": 48.265,
+          "end": 51.722
+        },
+        {
+          "lineIndex": 11,
+          "start": 52.28,
+          "end": 55.737
+        },
+        {
+          "lineIndex": 12,
+          "start": 56.295,
+          "end": 60.17
+        },
+        {
+          "lineIndex": 13,
+          "start": 60.728,
+          "end": 64.185
+        },
+        {
+          "lineIndex": 14,
+          "start": 64.743,
+          "end": 68.2
+        },
+        {
+          "lineIndex": 15,
+          "start": 68.758,
+          "end": 73.103
+        }
+      ]
+    },
+    {
+      "id": "london--hymn-alto",
+      "chunkId": "london",
+      "presetId": "hymn-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/london/hymn-alto.c2baf0765a9cf107.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 388248,
+          "sha256": "c2baf0765a9cf10712bab355662077ccd006676f11c0b4b8f46bbf823b623d00"
+        },
+        {
+          "path": "library/blake-songs/london/hymn-alto.d1f23d51b8a4dbc2.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 593335,
+          "sha256": "d1f23d51b8a4dbc223d02ec59a0bdb539f61d1695bac2592bae191b9f1428a97"
+        }
+      ],
+      "durationSeconds": 95.207,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.463,
+          "end": 6.348
+        },
+        {
+          "lineIndex": 1,
+          "start": 7.079,
+          "end": 12.512
+        },
+        {
+          "lineIndex": 2,
+          "start": 13.244,
+          "end": 18.677
+        },
+        {
+          "lineIndex": 3,
+          "start": 19.409,
+          "end": 23.744
+        },
+        {
+          "lineIndex": 4,
+          "start": 24.476,
+          "end": 30.457
+        },
+        {
+          "lineIndex": 5,
+          "start": 31.189,
+          "end": 36.622
+        },
+        {
+          "lineIndex": 6,
+          "start": 37.354,
+          "end": 43.335
+        },
+        {
+          "lineIndex": 7,
+          "start": 44.067,
+          "end": 49.5
+        },
+        {
+          "lineIndex": 8,
+          "start": 50.232,
+          "end": 54.567
+        },
+        {
+          "lineIndex": 9,
+          "start": 55.299,
+          "end": 60.183
+        },
+        {
+          "lineIndex": 10,
+          "start": 60.915,
+          "end": 65.25
+        },
+        {
+          "lineIndex": 11,
+          "start": 65.982,
+          "end": 70.317
+        },
+        {
+          "lineIndex": 12,
+          "start": 71.049,
+          "end": 75.933
+        },
+        {
+          "lineIndex": 13,
+          "start": 76.665,
+          "end": 81
+        },
+        {
+          "lineIndex": 14,
+          "start": 81.732,
+          "end": 86.067
+        },
+        {
+          "lineIndex": 15,
+          "start": 86.799,
+          "end": 92.232
+        }
+      ]
+    },
+    {
+      "id": "london--hymn-treble",
+      "chunkId": "london",
+      "presetId": "hymn-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/london/hymn-treble.6a6535286c36469c.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 414172,
+          "sha256": "6a6535286c36469c43e64a29e3e5018fc217076c52b3ed5a2e68b83b7a7264da"
+        },
+        {
+          "path": "library/blake-songs/london/hymn-treble.3fff5a54bb723259.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 565285,
+          "sha256": "3fff5a54bb723259cef3b6dd4ce20f0b56ac91d04a8700c5a385f63a49431371"
+        }
+      ],
+      "durationSeconds": 90.707,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.394,
+          "end": 6.045
+        },
+        {
+          "lineIndex": 1,
+          "start": 6.742,
+          "end": 11.916
+        },
+        {
+          "lineIndex": 2,
+          "start": 12.613,
+          "end": 17.787
+        },
+        {
+          "lineIndex": 3,
+          "start": 18.484,
+          "end": 22.613
+        },
+        {
+          "lineIndex": 4,
+          "start": 23.31,
+          "end": 29.007
+        },
+        {
+          "lineIndex": 5,
+          "start": 29.704,
+          "end": 34.878
+        },
+        {
+          "lineIndex": 6,
+          "start": 35.575,
+          "end": 41.272
+        },
+        {
+          "lineIndex": 7,
+          "start": 41.969,
+          "end": 47.143
+        },
+        {
+          "lineIndex": 8,
+          "start": 47.84,
+          "end": 51.969
+        },
+        {
+          "lineIndex": 9,
+          "start": 52.666,
+          "end": 57.317
+        },
+        {
+          "lineIndex": 10,
+          "start": 58.014,
+          "end": 62.143
+        },
+        {
+          "lineIndex": 11,
+          "start": 62.84,
+          "end": 66.969
+        },
+        {
+          "lineIndex": 12,
+          "start": 67.666,
+          "end": 72.317
+        },
+        {
+          "lineIndex": 13,
+          "start": 73.014,
+          "end": 77.143
+        },
+        {
+          "lineIndex": 14,
+          "start": 77.84,
+          "end": 81.969
+        },
+        {
+          "lineIndex": 15,
+          "start": 82.666,
+          "end": 87.84
+        }
+      ]
+    },
+    {
+      "id": "nurses-song--folk-alto",
+      "chunkId": "nurses-song",
+      "presetId": "folk-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/nurses-song/folk-alto.a6289ae9a2aa8559.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 351790,
+          "sha256": "a6289ae9a2aa85596c03c3c14a8196c2ea80044d56615cb332eb574c3e8e400e"
+        },
+        {
+          "path": "library/blake-songs/nurses-song/folk-alto.65fbe1099df68e3e.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 493656,
+          "sha256": "65fbe1099df68e3e082cb078637347f0554362d24809a75b8ae237ca4cbe14d1"
+        }
+      ],
+      "durationSeconds": 79.107,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.071,
+          "end": 6.496
+        },
+        {
+          "lineIndex": 1,
+          "start": 7.031,
+          "end": 10.752
+        },
+        {
+          "lineIndex": 2,
+          "start": 11.288,
+          "end": 15.458
+        },
+        {
+          "lineIndex": 3,
+          "start": 15.994,
+          "end": 19.714
+        },
+        {
+          "lineIndex": 4,
+          "start": 20.25,
+          "end": 25.272
+        },
+        {
+          "lineIndex": 5,
+          "start": 25.808,
+          "end": 29.127
+        },
+        {
+          "lineIndex": 6,
+          "start": 29.662,
+          "end": 34.235
+        },
+        {
+          "lineIndex": 7,
+          "start": 34.771,
+          "end": 38.941
+        },
+        {
+          "lineIndex": 8,
+          "start": 39.477,
+          "end": 44.049
+        },
+        {
+          "lineIndex": 9,
+          "start": 44.585,
+          "end": 47.904
+        },
+        {
+          "lineIndex": 10,
+          "start": 48.439,
+          "end": 53.462
+        },
+        {
+          "lineIndex": 11,
+          "start": 53.997,
+          "end": 58.168
+        },
+        {
+          "lineIndex": 12,
+          "start": 58.704,
+          "end": 64.128
+        },
+        {
+          "lineIndex": 13,
+          "start": 64.663,
+          "end": 67.532
+        },
+        {
+          "lineIndex": 14,
+          "start": 68.068,
+          "end": 73.492
+        },
+        {
+          "lineIndex": 15,
+          "start": 74.028,
+          "end": 76.896
+        }
+      ]
+    },
+    {
+      "id": "nurses-song--folk-treble",
+      "chunkId": "nurses-song",
+      "presetId": "folk-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/nurses-song/folk-treble.51f34531336bb2d1.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 389748,
+          "sha256": "51f34531336bb2d1e2634c901bc596d8c83901e1287fcf6856ec882e2ba3bf02"
+        },
+        {
+          "path": "library/blake-songs/nurses-song/folk-treble.269b44802852cd41.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 515686,
+          "sha256": "269b44802852cd41efe0de66c15d81b683d8ed6e4dee6bdbe5ddd76a1c40e6de"
+        }
+      ],
+      "durationSeconds": 82.407,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.116,
+          "end": 6.766
+        },
+        {
+          "lineIndex": 1,
+          "start": 7.324,
+          "end": 11.2
+        },
+        {
+          "lineIndex": 2,
+          "start": 11.758,
+          "end": 16.102
+        },
+        {
+          "lineIndex": 3,
+          "start": 16.66,
+          "end": 20.536
+        },
+        {
+          "lineIndex": 4,
+          "start": 21.094,
+          "end": 26.325
+        },
+        {
+          "lineIndex": 5,
+          "start": 26.883,
+          "end": 30.34
+        },
+        {
+          "lineIndex": 6,
+          "start": 30.898,
+          "end": 35.661
+        },
+        {
+          "lineIndex": 7,
+          "start": 36.219,
+          "end": 40.564
+        },
+        {
+          "lineIndex": 8,
+          "start": 41.122,
+          "end": 45.884
+        },
+        {
+          "lineIndex": 9,
+          "start": 46.443,
+          "end": 49.9
+        },
+        {
+          "lineIndex": 10,
+          "start": 50.458,
+          "end": 55.689
+        },
+        {
+          "lineIndex": 11,
+          "start": 56.247,
+          "end": 60.592
+        },
+        {
+          "lineIndex": 12,
+          "start": 61.15,
+          "end": 66.8
+        },
+        {
+          "lineIndex": 13,
+          "start": 67.358,
+          "end": 70.346
+        },
+        {
+          "lineIndex": 14,
+          "start": 70.904,
+          "end": 76.554
+        },
+        {
+          "lineIndex": 15,
+          "start": 77.112,
+          "end": 80.1
+        }
+      ]
+    },
+    {
+      "id": "nurses-song--hymn-alto",
+      "chunkId": "nurses-song",
+      "presetId": "hymn-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/nurses-song/hymn-alto.96f803ba1476cc71.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 428062,
+          "sha256": "96f803ba1476cc71f26b805e9eb0db014b1f9cfce710bffcf79a47295104032c"
+        },
+        {
+          "path": "library/blake-songs/nurses-song/hymn-alto.be009ed8e04ad258.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 647397,
+          "sha256": "be009ed8e04ad25822ce83794bb5c2124e1822250f4de6fbe8e0ce55e74dd90f"
+        }
+      ],
+      "durationSeconds": 104.007,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.463,
+          "end": 8.543
+        },
+        {
+          "lineIndex": 1,
+          "start": 9.274,
+          "end": 14.159
+        },
+        {
+          "lineIndex": 2,
+          "start": 14.89,
+          "end": 20.323
+        },
+        {
+          "lineIndex": 3,
+          "start": 21.055,
+          "end": 25.939
+        },
+        {
+          "lineIndex": 4,
+          "start": 26.671,
+          "end": 33.201
+        },
+        {
+          "lineIndex": 5,
+          "start": 33.933,
+          "end": 38.268
+        },
+        {
+          "lineIndex": 6,
+          "start": 39,
+          "end": 44.982
+        },
+        {
+          "lineIndex": 7,
+          "start": 45.713,
+          "end": 51.146
+        },
+        {
+          "lineIndex": 8,
+          "start": 51.878,
+          "end": 57.86
+        },
+        {
+          "lineIndex": 9,
+          "start": 58.591,
+          "end": 62.927
+        },
+        {
+          "lineIndex": 10,
+          "start": 63.659,
+          "end": 70.189
+        },
+        {
+          "lineIndex": 11,
+          "start": 70.921,
+          "end": 76.354
+        },
+        {
+          "lineIndex": 12,
+          "start": 77.085,
+          "end": 84.165
+        },
+        {
+          "lineIndex": 13,
+          "start": 84.896,
+          "end": 88.683
+        },
+        {
+          "lineIndex": 14,
+          "start": 89.415,
+          "end": 96.494
+        },
+        {
+          "lineIndex": 15,
+          "start": 97.226,
+          "end": 101.012
+        }
+      ]
+    },
+    {
+      "id": "nurses-song--hymn-treble",
+      "chunkId": "nurses-song",
+      "presetId": "hymn-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/nurses-song/hymn-treble.b915af86e1291dc9.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 452669,
+          "sha256": "b915af86e1291dc9d9f8828795747adee0711a1c5acdbbc3a470aad48067094f"
+        },
+        {
+          "path": "library/blake-songs/nurses-song/hymn-treble.fbb1bc4065dec6b1.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 617490,
+          "sha256": "fbb1bc4065dec6b1a78d273420905d6768ac4b7743810dba6a4c95fc6558b453"
+        }
+      ],
+      "durationSeconds": 99.007,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.394,
+          "end": 8.136
+        },
+        {
+          "lineIndex": 1,
+          "start": 8.833,
+          "end": 13.484
+        },
+        {
+          "lineIndex": 2,
+          "start": 14.181,
+          "end": 19.355
+        },
+        {
+          "lineIndex": 3,
+          "start": 20.052,
+          "end": 24.704
+        },
+        {
+          "lineIndex": 4,
+          "start": 25.401,
+          "end": 31.62
+        },
+        {
+          "lineIndex": 5,
+          "start": 32.317,
+          "end": 36.446
+        },
+        {
+          "lineIndex": 6,
+          "start": 37.143,
+          "end": 42.84
+        },
+        {
+          "lineIndex": 7,
+          "start": 43.537,
+          "end": 48.711
+        },
+        {
+          "lineIndex": 8,
+          "start": 49.408,
+          "end": 55.105
+        },
+        {
+          "lineIndex": 9,
+          "start": 55.801,
+          "end": 59.93
+        },
+        {
+          "lineIndex": 10,
+          "start": 60.627,
+          "end": 66.847
+        },
+        {
+          "lineIndex": 11,
+          "start": 67.544,
+          "end": 72.718
+        },
+        {
+          "lineIndex": 12,
+          "start": 73.415,
+          "end": 80.157
+        },
+        {
+          "lineIndex": 13,
+          "start": 80.854,
+          "end": 84.46
+        },
+        {
+          "lineIndex": 14,
+          "start": 85.157,
+          "end": 91.899
+        },
+        {
+          "lineIndex": 15,
+          "start": 92.596,
+          "end": 96.202
+        }
+      ]
+    },
+    {
+      "id": "the-blossom--folk-alto",
+      "chunkId": "the-blossom",
+      "presetId": "folk-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-blossom/folk-alto.76591a6c29dff68b.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 182119,
+          "sha256": "76591a6c29dff68b3f499dbe2bcf6af270f64a25840bae856f02bf93542cd4d0"
+        },
+        {
+          "path": "library/blake-songs/the-blossom/folk-alto.83b8d1d94ff3dfc0.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 256454,
+          "sha256": "83b8d1d94ff3dfc0d806a22f295c6ea1b478eda197f5558857761c229161e960"
+        }
+      ],
+      "durationSeconds": 41.107,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.071,
+          "end": 3.94
+        },
+        {
+          "lineIndex": 1,
+          "start": 4.476,
+          "end": 7.345
+        },
+        {
+          "lineIndex": 2,
+          "start": 7.88,
+          "end": 10.347
+        },
+        {
+          "lineIndex": 3,
+          "start": 10.883,
+          "end": 13.752
+        },
+        {
+          "lineIndex": 4,
+          "start": 14.287,
+          "end": 17.156
+        },
+        {
+          "lineIndex": 5,
+          "start": 17.692,
+          "end": 19.709
+        },
+        {
+          "lineIndex": 6,
+          "start": 20.245,
+          "end": 23.113
+        },
+        {
+          "lineIndex": 7,
+          "start": 23.649,
+          "end": 26.518
+        },
+        {
+          "lineIndex": 8,
+          "start": 27.054,
+          "end": 29.521
+        },
+        {
+          "lineIndex": 9,
+          "start": 30.056,
+          "end": 32.925
+        },
+        {
+          "lineIndex": 10,
+          "start": 33.461,
+          "end": 36.329
+        },
+        {
+          "lineIndex": 11,
+          "start": 36.865,
+          "end": 38.882
+        }
+      ]
+    },
+    {
+      "id": "the-blossom--folk-treble",
+      "chunkId": "the-blossom",
+      "presetId": "folk-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-blossom/folk-treble.3e439a145cb61946.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 202024,
+          "sha256": "3e439a145cb6194649256416e7202722e2d9de54c52486452f47580300071396"
+        },
+        {
+          "path": "library/blake-songs/the-blossom/folk-treble.e4e92e5896e94f95.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 268298,
+          "sha256": "e4e92e5896e94f95b00162d42a290afeb997e05f6a694280785c1a553b1791d3"
+        }
+      ],
+      "durationSeconds": 42.807,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.116,
+          "end": 4.104
+        },
+        {
+          "lineIndex": 1,
+          "start": 4.662,
+          "end": 7.651
+        },
+        {
+          "lineIndex": 2,
+          "start": 8.209,
+          "end": 10.778
+        },
+        {
+          "lineIndex": 3,
+          "start": 11.336,
+          "end": 14.325
+        },
+        {
+          "lineIndex": 4,
+          "start": 14.883,
+          "end": 17.871
+        },
+        {
+          "lineIndex": 5,
+          "start": 18.429,
+          "end": 20.53
+        },
+        {
+          "lineIndex": 6,
+          "start": 21.088,
+          "end": 24.076
+        },
+        {
+          "lineIndex": 7,
+          "start": 24.634,
+          "end": 27.623
+        },
+        {
+          "lineIndex": 8,
+          "start": 28.181,
+          "end": 30.751
+        },
+        {
+          "lineIndex": 9,
+          "start": 31.309,
+          "end": 34.297
+        },
+        {
+          "lineIndex": 10,
+          "start": 34.855,
+          "end": 37.843
+        },
+        {
+          "lineIndex": 11,
+          "start": 38.401,
+          "end": 40.502
+        }
+      ]
+    },
+    {
+      "id": "the-blossom--hymn-alto",
+      "chunkId": "the-blossom",
+      "presetId": "hymn-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-blossom/hymn-alto.022999d8ae0ab9aa.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 223951,
+          "sha256": "022999d8ae0ab9aa13498985797b0606ab4a4f123393be527dd78d270837fbf9"
+        },
+        {
+          "path": "library/blake-songs/the-blossom/hymn-alto.5ecaaeab03dc2511.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 340864,
+          "sha256": "5ecaaeab03dc25115fc22ab2200a826da394aa7eb3235920ae70fb411a1838c9"
+        }
+      ],
+      "durationSeconds": 54.607,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.463,
+          "end": 5.25
+        },
+        {
+          "lineIndex": 1,
+          "start": 5.982,
+          "end": 9.768
+        },
+        {
+          "lineIndex": 2,
+          "start": 10.5,
+          "end": 13.738
+        },
+        {
+          "lineIndex": 3,
+          "start": 14.47,
+          "end": 18.256
+        },
+        {
+          "lineIndex": 4,
+          "start": 18.988,
+          "end": 22.774
+        },
+        {
+          "lineIndex": 5,
+          "start": 23.506,
+          "end": 26.195
+        },
+        {
+          "lineIndex": 6,
+          "start": 26.927,
+          "end": 30.713
+        },
+        {
+          "lineIndex": 7,
+          "start": 31.445,
+          "end": 35.232
+        },
+        {
+          "lineIndex": 8,
+          "start": 35.963,
+          "end": 39.201
+        },
+        {
+          "lineIndex": 9,
+          "start": 39.933,
+          "end": 43.72
+        },
+        {
+          "lineIndex": 10,
+          "start": 44.451,
+          "end": 48.238
+        },
+        {
+          "lineIndex": 11,
+          "start": 48.97,
+          "end": 51.659
+        }
+      ]
+    },
+    {
+      "id": "the-blossom--hymn-treble",
+      "chunkId": "the-blossom",
+      "presetId": "hymn-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-blossom/hymn-treble.8baa642769730c2e.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 239683,
+          "sha256": "8baa642769730c2efbef5f1b28212099e356314d27f8f315ceb78565a8ac8ec8"
+        },
+        {
+          "path": "library/blake-songs/the-blossom/hymn-treble.b4c39e09aa6b94f8.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 325328,
+          "sha256": "b4c39e09aa6b94f82974880bceafee377bb4085dccb69421bf8fb9c6a3c98262"
+        }
+      ],
+      "durationSeconds": 52.007,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.394,
+          "end": 5
+        },
+        {
+          "lineIndex": 1,
+          "start": 5.697,
+          "end": 9.303
+        },
+        {
+          "lineIndex": 2,
+          "start": 10,
+          "end": 13.084
+        },
+        {
+          "lineIndex": 3,
+          "start": 13.78,
+          "end": 17.387
+        },
+        {
+          "lineIndex": 4,
+          "start": 18.084,
+          "end": 21.69
+        },
+        {
+          "lineIndex": 5,
+          "start": 22.387,
+          "end": 24.948
+        },
+        {
+          "lineIndex": 6,
+          "start": 25.645,
+          "end": 29.251
+        },
+        {
+          "lineIndex": 7,
+          "start": 29.948,
+          "end": 33.554
+        },
+        {
+          "lineIndex": 8,
+          "start": 34.251,
+          "end": 37.334
+        },
+        {
+          "lineIndex": 9,
+          "start": 38.031,
+          "end": 41.638
+        },
+        {
+          "lineIndex": 10,
+          "start": 42.334,
+          "end": 45.941
+        },
+        {
+          "lineIndex": 11,
+          "start": 46.638,
+          "end": 49.199
+        }
+      ]
+    },
+    {
+      "id": "the-lamb--folk-alto",
+      "chunkId": "the-lamb",
+      "presetId": "folk-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-lamb/folk-alto.fa96631551cb669e.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 342196,
+          "sha256": "fa96631551cb669e31d551d9c0530f67b338684ff9fa214a0a11038dd64be069"
+        },
+        {
+          "path": "library/blake-songs/the-lamb/folk-alto.01c9147a5c16d64e.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 477971,
+          "sha256": "01c9147a5c16d64e6ddaec90537ee9b6de4917ce0874c610329c91374149da4e"
+        }
+      ],
+      "durationSeconds": 76.607,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.071,
+          "end": 3.94
+        },
+        {
+          "lineIndex": 1,
+          "start": 4.476,
+          "end": 7.345
+        },
+        {
+          "lineIndex": 2,
+          "start": 7.88,
+          "end": 11.199
+        },
+        {
+          "lineIndex": 3,
+          "start": 11.735,
+          "end": 15.054
+        },
+        {
+          "lineIndex": 4,
+          "start": 15.589,
+          "end": 18.908
+        },
+        {
+          "lineIndex": 5,
+          "start": 19.444,
+          "end": 22.762
+        },
+        {
+          "lineIndex": 6,
+          "start": 23.298,
+          "end": 26.617
+        },
+        {
+          "lineIndex": 7,
+          "start": 27.153,
+          "end": 30.873
+        },
+        {
+          "lineIndex": 8,
+          "start": 31.409,
+          "end": 34.278
+        },
+        {
+          "lineIndex": 9,
+          "start": 34.813,
+          "end": 37.682
+        },
+        {
+          "lineIndex": 10,
+          "start": 38.218,
+          "end": 41.087
+        },
+        {
+          "lineIndex": 11,
+          "start": 41.622,
+          "end": 44.491
+        },
+        {
+          "lineIndex": 12,
+          "start": 45.027,
+          "end": 48.346
+        },
+        {
+          "lineIndex": 13,
+          "start": 48.881,
+          "end": 52.2
+        },
+        {
+          "lineIndex": 14,
+          "start": 52.736,
+          "end": 56.054
+        },
+        {
+          "lineIndex": 15,
+          "start": 56.59,
+          "end": 59.909
+        },
+        {
+          "lineIndex": 16,
+          "start": 60.445,
+          "end": 63.763
+        },
+        {
+          "lineIndex": 17,
+          "start": 64.299,
+          "end": 67.618
+        },
+        {
+          "lineIndex": 18,
+          "start": 68.154,
+          "end": 71.022
+        },
+        {
+          "lineIndex": 19,
+          "start": 71.558,
+          "end": 74.427
+        }
+      ]
+    },
+    {
+      "id": "the-lamb--folk-treble",
+      "chunkId": "the-lamb",
+      "presetId": "folk-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-lamb/folk-treble.494bff68965b01a4.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 375473,
+          "sha256": "494bff68965b01a4cb22c7c9fe9796a74ad8da2c66e3386e96c794ea0f08c4d8"
+        },
+        {
+          "path": "library/blake-songs/the-lamb/folk-treble.efacce662f25728e.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 498726,
+          "sha256": "efacce662f25728e927916623c2178bfa051c2b8ed0581f5bfea64ad88630f65"
+        }
+      ],
+      "durationSeconds": 79.807,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.116,
+          "end": 4.104
+        },
+        {
+          "lineIndex": 1,
+          "start": 4.662,
+          "end": 7.651
+        },
+        {
+          "lineIndex": 2,
+          "start": 8.209,
+          "end": 11.666
+        },
+        {
+          "lineIndex": 3,
+          "start": 12.224,
+          "end": 15.681
+        },
+        {
+          "lineIndex": 4,
+          "start": 16.239,
+          "end": 19.696
+        },
+        {
+          "lineIndex": 5,
+          "start": 20.254,
+          "end": 23.711
+        },
+        {
+          "lineIndex": 6,
+          "start": 24.269,
+          "end": 27.726
+        },
+        {
+          "lineIndex": 7,
+          "start": 28.284,
+          "end": 32.16
+        },
+        {
+          "lineIndex": 8,
+          "start": 32.718,
+          "end": 35.706
+        },
+        {
+          "lineIndex": 9,
+          "start": 36.264,
+          "end": 39.252
+        },
+        {
+          "lineIndex": 10,
+          "start": 39.81,
+          "end": 42.799
+        },
+        {
+          "lineIndex": 11,
+          "start": 43.357,
+          "end": 46.345
+        },
+        {
+          "lineIndex": 12,
+          "start": 46.903,
+          "end": 50.36
+        },
+        {
+          "lineIndex": 13,
+          "start": 50.918,
+          "end": 54.375
+        },
+        {
+          "lineIndex": 14,
+          "start": 54.933,
+          "end": 58.39
+        },
+        {
+          "lineIndex": 15,
+          "start": 58.948,
+          "end": 62.405
+        },
+        {
+          "lineIndex": 16,
+          "start": 62.963,
+          "end": 66.42
+        },
+        {
+          "lineIndex": 17,
+          "start": 66.978,
+          "end": 70.435
+        },
+        {
+          "lineIndex": 18,
+          "start": 70.993,
+          "end": 73.982
+        },
+        {
+          "lineIndex": 19,
+          "start": 74.54,
+          "end": 77.528
+        }
+      ]
+    },
+    {
+      "id": "the-lamb--hymn-alto",
+      "chunkId": "the-lamb",
+      "presetId": "hymn-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-lamb/hymn-alto.e4d85e11a9ca232a.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 413761,
+          "sha256": "e4d85e11a9ca232acfafd44e801279abd0fcc2ac2ce8b4026243efda956509d5"
+        },
+        {
+          "path": "library/blake-songs/the-lamb/hymn-alto.f06cdb57a7d841ea.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 630446,
+          "sha256": "f06cdb57a7d841eab44438098d0847b1e790cb7ccafcddc08d7a1d8c912893e5"
+        }
+      ],
+      "durationSeconds": 101.207,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.463,
+          "end": 5.25
+        },
+        {
+          "lineIndex": 1,
+          "start": 5.982,
+          "end": 9.768
+        },
+        {
+          "lineIndex": 2,
+          "start": 10.5,
+          "end": 14.835
+        },
+        {
+          "lineIndex": 3,
+          "start": 15.567,
+          "end": 19.902
+        },
+        {
+          "lineIndex": 4,
+          "start": 20.634,
+          "end": 24.97
+        },
+        {
+          "lineIndex": 5,
+          "start": 25.701,
+          "end": 30.037
+        },
+        {
+          "lineIndex": 6,
+          "start": 30.768,
+          "end": 35.104
+        },
+        {
+          "lineIndex": 7,
+          "start": 35.835,
+          "end": 40.72
+        },
+        {
+          "lineIndex": 8,
+          "start": 41.451,
+          "end": 45.238
+        },
+        {
+          "lineIndex": 9,
+          "start": 45.97,
+          "end": 49.756
+        },
+        {
+          "lineIndex": 10,
+          "start": 50.488,
+          "end": 54.274
+        },
+        {
+          "lineIndex": 11,
+          "start": 55.006,
+          "end": 58.793
+        },
+        {
+          "lineIndex": 12,
+          "start": 59.524,
+          "end": 63.86
+        },
+        {
+          "lineIndex": 13,
+          "start": 64.591,
+          "end": 68.927
+        },
+        {
+          "lineIndex": 14,
+          "start": 69.659,
+          "end": 73.994
+        },
+        {
+          "lineIndex": 15,
+          "start": 74.726,
+          "end": 79.061
+        },
+        {
+          "lineIndex": 16,
+          "start": 79.793,
+          "end": 84.128
+        },
+        {
+          "lineIndex": 17,
+          "start": 84.86,
+          "end": 89.195
+        },
+        {
+          "lineIndex": 18,
+          "start": 89.927,
+          "end": 93.713
+        },
+        {
+          "lineIndex": 19,
+          "start": 94.445,
+          "end": 98.232
+        }
+      ]
+    },
+    {
+      "id": "the-lamb--hymn-treble",
+      "chunkId": "the-lamb",
+      "presetId": "hymn-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-lamb/hymn-treble.5a43866b57d66f49.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 441661,
+          "sha256": "5a43866b57d66f49a48615432be0eed55ae4bd2a42980b55956f96ac3cbb20dc"
+        },
+        {
+          "path": "library/blake-songs/the-lamb/hymn-treble.7b44b90a0c1fc3aa.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 602110,
+          "sha256": "7b44b90a0c1fc3aa0fc7158d20c78e2e055c394fda8ee550692ef07df017beb9"
+        }
+      ],
+      "durationSeconds": 96.407,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.394,
+          "end": 5
+        },
+        {
+          "lineIndex": 1,
+          "start": 5.697,
+          "end": 9.303
+        },
+        {
+          "lineIndex": 2,
+          "start": 10,
+          "end": 14.129
+        },
+        {
+          "lineIndex": 3,
+          "start": 14.826,
+          "end": 18.955
+        },
+        {
+          "lineIndex": 4,
+          "start": 19.652,
+          "end": 23.78
+        },
+        {
+          "lineIndex": 5,
+          "start": 24.477,
+          "end": 28.606
+        },
+        {
+          "lineIndex": 6,
+          "start": 29.303,
+          "end": 33.432
+        },
+        {
+          "lineIndex": 7,
+          "start": 34.129,
+          "end": 38.78
+        },
+        {
+          "lineIndex": 8,
+          "start": 39.477,
+          "end": 43.084
+        },
+        {
+          "lineIndex": 9,
+          "start": 43.78,
+          "end": 47.387
+        },
+        {
+          "lineIndex": 10,
+          "start": 48.084,
+          "end": 51.69
+        },
+        {
+          "lineIndex": 11,
+          "start": 52.387,
+          "end": 55.993
+        },
+        {
+          "lineIndex": 12,
+          "start": 56.69,
+          "end": 60.819
+        },
+        {
+          "lineIndex": 13,
+          "start": 61.516,
+          "end": 65.645
+        },
+        {
+          "lineIndex": 14,
+          "start": 66.341,
+          "end": 70.47
+        },
+        {
+          "lineIndex": 15,
+          "start": 71.167,
+          "end": 75.296
+        },
+        {
+          "lineIndex": 16,
+          "start": 75.993,
+          "end": 80.122
+        },
+        {
+          "lineIndex": 17,
+          "start": 80.819,
+          "end": 84.948
+        },
+        {
+          "lineIndex": 18,
+          "start": 85.645,
+          "end": 89.251
+        },
+        {
+          "lineIndex": 19,
+          "start": 89.948,
+          "end": 93.554
+        }
+      ]
+    },
+    {
+      "id": "the-shepherd--folk-alto",
+      "chunkId": "the-shepherd",
+      "presetId": "folk-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-shepherd/folk-alto.0d165d42bd561425.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 180463,
+          "sha256": "0d165d42bd5614252692108b674d6728d89d3737f2e64e5a9496516ed9e54412"
+        },
+        {
+          "path": "library/blake-songs/the-shepherd/folk-alto.383ace773e185352.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 256870,
+          "sha256": "383ace773e1853527732e7e2b974402322c1c14b7240fd8e8563faa525b7bfbe"
+        }
+      ],
+      "durationSeconds": 41.107,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.071,
+          "end": 4.792
+        },
+        {
+          "lineIndex": 1,
+          "start": 5.328,
+          "end": 9.9
+        },
+        {
+          "lineIndex": 2,
+          "start": 10.436,
+          "end": 14.606
+        },
+        {
+          "lineIndex": 3,
+          "start": 15.142,
+          "end": 19.714
+        },
+        {
+          "lineIndex": 4,
+          "start": 20.25,
+          "end": 24.421
+        },
+        {
+          "lineIndex": 5,
+          "start": 24.956,
+          "end": 29.529
+        },
+        {
+          "lineIndex": 6,
+          "start": 30.064,
+          "end": 34.235
+        },
+        {
+          "lineIndex": 7,
+          "start": 34.771,
+          "end": 38.941
+        }
+      ]
+    },
+    {
+      "id": "the-shepherd--folk-treble",
+      "chunkId": "the-shepherd",
+      "presetId": "folk-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-shepherd/folk-treble.f99c759ba8ccf5f9.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 205751,
+          "sha256": "f99c759ba8ccf5f9e984ca7c98ccb632f9d360050e2fe1cab1db320bd40357d3"
+        },
+        {
+          "path": "library/blake-songs/the-shepherd/folk-treble.5bee5ac60e9a25c6.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 268008,
+          "sha256": "5bee5ac60e9a25c6c3b3870c9eff607dcb74ecb5f17660ba0b33ffc3052b1767"
+        }
+      ],
+      "durationSeconds": 42.807,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.116,
+          "end": 4.992
+        },
+        {
+          "lineIndex": 1,
+          "start": 5.55,
+          "end": 10.313
+        },
+        {
+          "lineIndex": 2,
+          "start": 10.871,
+          "end": 15.215
+        },
+        {
+          "lineIndex": 3,
+          "start": 15.773,
+          "end": 20.536
+        },
+        {
+          "lineIndex": 4,
+          "start": 21.094,
+          "end": 25.438
+        },
+        {
+          "lineIndex": 5,
+          "start": 25.996,
+          "end": 30.759
+        },
+        {
+          "lineIndex": 6,
+          "start": 31.317,
+          "end": 35.661
+        },
+        {
+          "lineIndex": 7,
+          "start": 36.219,
+          "end": 40.564
+        }
+      ]
+    },
+    {
+      "id": "the-shepherd--hymn-alto",
+      "chunkId": "the-shepherd",
+      "presetId": "hymn-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-shepherd/hymn-alto.3e90652c52ab35b6.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 224106,
+          "sha256": "3e90652c52ab35b6f3f277183a83532d12091a1f3260a056a690de3f0d07cc4b"
+        },
+        {
+          "path": "library/blake-songs/the-shepherd/hymn-alto.b229f70607206347.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 337569,
+          "sha256": "b229f70607206347c59463009dfecbba76b9e99a934be3c39e7acae5adfcc895"
+        }
+      ],
+      "durationSeconds": 54.107,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.463,
+          "end": 6.348
+        },
+        {
+          "lineIndex": 1,
+          "start": 7.079,
+          "end": 13.061
+        },
+        {
+          "lineIndex": 2,
+          "start": 13.793,
+          "end": 19.226
+        },
+        {
+          "lineIndex": 3,
+          "start": 19.957,
+          "end": 25.939
+        },
+        {
+          "lineIndex": 4,
+          "start": 26.671,
+          "end": 32.104
+        },
+        {
+          "lineIndex": 5,
+          "start": 32.835,
+          "end": 38.817
+        },
+        {
+          "lineIndex": 6,
+          "start": 39.549,
+          "end": 44.982
+        },
+        {
+          "lineIndex": 7,
+          "start": 45.713,
+          "end": 51.146
+        }
+      ]
+    },
+    {
+      "id": "the-shepherd--hymn-treble",
+      "chunkId": "the-shepherd",
+      "presetId": "hymn-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-shepherd/hymn-treble.bb3cfc9873315d9d.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 234437,
+          "sha256": "bb3cfc9873315d9dbe91ca8fa15e295139121f2f3bd0851e87d74f8d1793c761"
+        },
+        {
+          "path": "library/blake-songs/the-shepherd/hymn-treble.6100aa8dfe998770.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 322122,
+          "sha256": "6100aa8dfe99877015a4d3952d7d76989386ca2bffaa9f3efebb7fd90b080655"
+        }
+      ],
+      "durationSeconds": 51.507,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.394,
+          "end": 6.045
+        },
+        {
+          "lineIndex": 1,
+          "start": 6.742,
+          "end": 12.439
+        },
+        {
+          "lineIndex": 2,
+          "start": 13.136,
+          "end": 18.31
+        },
+        {
+          "lineIndex": 3,
+          "start": 19.007,
+          "end": 24.704
+        },
+        {
+          "lineIndex": 4,
+          "start": 25.401,
+          "end": 30.575
+        },
+        {
+          "lineIndex": 5,
+          "start": 31.272,
+          "end": 36.969
+        },
+        {
+          "lineIndex": 6,
+          "start": 37.666,
+          "end": 42.84
+        },
+        {
+          "lineIndex": 7,
+          "start": 43.537,
+          "end": 48.711
+        }
+      ]
+    },
+    {
+      "id": "the-sick-rose--folk-alto",
+      "chunkId": "the-sick-rose",
+      "presetId": "folk-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-sick-rose/folk-alto.3b63e9722123e4be.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 116032,
+          "sha256": "3b63e9722123e4be4ce99868cc071cafed852b8f49132fd1b85a8b2c7d27ff81"
+        },
+        {
+          "path": "library/blake-songs/the-sick-rose/folk-alto.e18dce017b577b52.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 169820,
+          "sha256": "e18dce017b577b522159cc398dd296cb4ece22166b9a0a7f33ab0522c291a97b"
+        }
+      ],
+      "durationSeconds": 27.127,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.071,
+          "end": 3.538
+        },
+        {
+          "lineIndex": 1,
+          "start": 4.074,
+          "end": 6.943
+        },
+        {
+          "lineIndex": 2,
+          "start": 7.479,
+          "end": 9.946
+        },
+        {
+          "lineIndex": 3,
+          "start": 10.481,
+          "end": 12.948
+        },
+        {
+          "lineIndex": 4,
+          "start": 13.484,
+          "end": 15.951
+        },
+        {
+          "lineIndex": 5,
+          "start": 16.487,
+          "end": 18.504
+        },
+        {
+          "lineIndex": 6,
+          "start": 19.039,
+          "end": 21.908
+        },
+        {
+          "lineIndex": 7,
+          "start": 22.444,
+          "end": 24.911
+        }
+      ]
+    },
+    {
+      "id": "the-sick-rose--folk-treble",
+      "chunkId": "the-sick-rose",
+      "presetId": "folk-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-sick-rose/folk-treble.1038693b4046228f.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 135020,
+          "sha256": "1038693b4046228fef6e53833db443a154d683527e497703f46f2286d5f381b2"
+        },
+        {
+          "path": "library/blake-songs/the-sick-rose/folk-treble.6bde83ac939f6c1f.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 176940,
+          "sha256": "6bde83ac939f6c1fd37c50f33e37824b15270784e51ad57ea8a2512999ee509c"
+        }
+      ],
+      "durationSeconds": 28.207,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.116,
+          "end": 3.686
+        },
+        {
+          "lineIndex": 1,
+          "start": 4.244,
+          "end": 7.232
+        },
+        {
+          "lineIndex": 2,
+          "start": 7.79,
+          "end": 10.36
+        },
+        {
+          "lineIndex": 3,
+          "start": 10.918,
+          "end": 13.488
+        },
+        {
+          "lineIndex": 4,
+          "start": 14.046,
+          "end": 16.616
+        },
+        {
+          "lineIndex": 5,
+          "start": 17.174,
+          "end": 19.275
+        },
+        {
+          "lineIndex": 6,
+          "start": 19.833,
+          "end": 22.821
+        },
+        {
+          "lineIndex": 7,
+          "start": 23.379,
+          "end": 25.949
+        }
+      ]
+    },
+    {
+      "id": "the-sick-rose--hymn-alto",
+      "chunkId": "the-sick-rose",
+      "presetId": "hymn-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-sick-rose/hymn-alto.151c7775be8ff6c1.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 145743,
+          "sha256": "151c7775be8ff6c17e47699ee78aa445def4148bb4d256d84809d9dbf8c65540"
+        },
+        {
+          "path": "library/blake-songs/the-sick-rose/hymn-alto.7a4051b111086364.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 224932,
+          "sha256": "7a4051b1110863645797a6118ab957847e026d160d6fbf295ebe11eff938e6f8"
+        }
+      ],
+      "durationSeconds": 36.007,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.463,
+          "end": 4.701
+        },
+        {
+          "lineIndex": 1,
+          "start": 5.433,
+          "end": 9.22
+        },
+        {
+          "lineIndex": 2,
+          "start": 9.951,
+          "end": 13.189
+        },
+        {
+          "lineIndex": 3,
+          "start": 13.921,
+          "end": 17.159
+        },
+        {
+          "lineIndex": 4,
+          "start": 17.89,
+          "end": 21.128
+        },
+        {
+          "lineIndex": 5,
+          "start": 21.86,
+          "end": 24.549
+        },
+        {
+          "lineIndex": 6,
+          "start": 25.28,
+          "end": 29.067
+        },
+        {
+          "lineIndex": 7,
+          "start": 29.799,
+          "end": 33.037
+        }
+      ]
+    },
+    {
+      "id": "the-sick-rose--hymn-treble",
+      "chunkId": "the-sick-rose",
+      "presetId": "hymn-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-sick-rose/hymn-treble.ce439234e29e6559.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 158349,
+          "sha256": "ce439234e29e6559138a46da531a41f03724bf8fba20ebd83d50e23b4f15c20c"
+        },
+        {
+          "path": "library/blake-songs/the-sick-rose/hymn-treble.9ed2c9d78c9a6042.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 214237,
+          "sha256": "9ed2c9d78c9a6042df913f230e2d28272194e9fa9d573ebbe5e452010eb66cb5"
+        }
+      ],
+      "durationSeconds": 34.307,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.394,
+          "end": 4.477
+        },
+        {
+          "lineIndex": 1,
+          "start": 5.174,
+          "end": 8.78
+        },
+        {
+          "lineIndex": 2,
+          "start": 9.477,
+          "end": 12.561
+        },
+        {
+          "lineIndex": 3,
+          "start": 13.258,
+          "end": 16.341
+        },
+        {
+          "lineIndex": 4,
+          "start": 17.038,
+          "end": 20.122
+        },
+        {
+          "lineIndex": 5,
+          "start": 20.819,
+          "end": 23.38
+        },
+        {
+          "lineIndex": 6,
+          "start": 24.077,
+          "end": 27.683
+        },
+        {
+          "lineIndex": 7,
+          "start": 28.38,
+          "end": 31.463
+        }
+      ]
+    },
+    {
+      "id": "the-tyger--folk-alto",
+      "chunkId": "the-tyger",
+      "presetId": "folk-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-tyger/folk-alto.85a28965729bc8ea.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 432022,
+          "sha256": "85a28965729bc8ea00f6d44455212efd7c3405b002cb7fe79d0a871d436bf74a"
+        },
+        {
+          "path": "library/blake-songs/the-tyger/folk-alto.0c208997e6078b75.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 605031,
+          "sha256": "0c208997e6078b7509e742199547569c136372a638253de6b3d681b2f08b8721"
+        }
+      ],
+      "durationSeconds": 97.207,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.071,
+          "end": 4.39
+        },
+        {
+          "lineIndex": 1,
+          "start": 4.926,
+          "end": 8.245
+        },
+        {
+          "lineIndex": 2,
+          "start": 8.78,
+          "end": 12.099
+        },
+        {
+          "lineIndex": 3,
+          "start": 12.635,
+          "end": 16.355
+        },
+        {
+          "lineIndex": 4,
+          "start": 16.891,
+          "end": 20.21
+        },
+        {
+          "lineIndex": 5,
+          "start": 20.746,
+          "end": 23.614
+        },
+        {
+          "lineIndex": 6,
+          "start": 24.15,
+          "end": 27.469
+        },
+        {
+          "lineIndex": 7,
+          "start": 28.004,
+          "end": 31.323
+        },
+        {
+          "lineIndex": 8,
+          "start": 31.859,
+          "end": 35.178
+        },
+        {
+          "lineIndex": 9,
+          "start": 35.713,
+          "end": 39.434
+        },
+        {
+          "lineIndex": 10,
+          "start": 39.97,
+          "end": 43.69
+        },
+        {
+          "lineIndex": 11,
+          "start": 44.226,
+          "end": 47.545
+        },
+        {
+          "lineIndex": 12,
+          "start": 48.08,
+          "end": 51.399
+        },
+        {
+          "lineIndex": 13,
+          "start": 51.935,
+          "end": 55.254
+        },
+        {
+          "lineIndex": 14,
+          "start": 55.789,
+          "end": 59.108
+        },
+        {
+          "lineIndex": 15,
+          "start": 59.644,
+          "end": 62.963
+        },
+        {
+          "lineIndex": 16,
+          "start": 63.498,
+          "end": 66.817
+        },
+        {
+          "lineIndex": 17,
+          "start": 67.353,
+          "end": 71.073
+        },
+        {
+          "lineIndex": 18,
+          "start": 71.609,
+          "end": 74.928
+        },
+        {
+          "lineIndex": 19,
+          "start": 75.463,
+          "end": 79.184
+        },
+        {
+          "lineIndex": 20,
+          "start": 79.72,
+          "end": 83.038
+        },
+        {
+          "lineIndex": 21,
+          "start": 83.574,
+          "end": 86.893
+        },
+        {
+          "lineIndex": 22,
+          "start": 87.429,
+          "end": 90.747
+        },
+        {
+          "lineIndex": 23,
+          "start": 91.283,
+          "end": 95.004
+        }
+      ]
+    },
+    {
+      "id": "the-tyger--folk-treble",
+      "chunkId": "the-tyger",
+      "presetId": "folk-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-tyger/folk-treble.c5e5130a5b9a15d0.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 477633,
+          "sha256": "c5e5130a5b9a15d0217593e689cb253f8f81e553bde7f882b60efb5364a430cf"
+        },
+        {
+          "path": "library/blake-songs/the-tyger/folk-treble.a78f7b7860eaecb4.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 631537,
+          "sha256": "a78f7b7860eaecb4a03f1b8852aab57aae61df187c4ddaa3686c0a6c87ccba4c"
+        }
+      ],
+      "durationSeconds": 101.207,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.116,
+          "end": 4.573
+        },
+        {
+          "lineIndex": 1,
+          "start": 5.131,
+          "end": 8.588
+        },
+        {
+          "lineIndex": 2,
+          "start": 9.146,
+          "end": 12.603
+        },
+        {
+          "lineIndex": 3,
+          "start": 13.161,
+          "end": 17.037
+        },
+        {
+          "lineIndex": 4,
+          "start": 17.595,
+          "end": 21.052
+        },
+        {
+          "lineIndex": 5,
+          "start": 21.61,
+          "end": 24.598
+        },
+        {
+          "lineIndex": 6,
+          "start": 25.156,
+          "end": 28.613
+        },
+        {
+          "lineIndex": 7,
+          "start": 29.171,
+          "end": 32.628
+        },
+        {
+          "lineIndex": 8,
+          "start": 33.186,
+          "end": 36.643
+        },
+        {
+          "lineIndex": 9,
+          "start": 37.201,
+          "end": 41.077
+        },
+        {
+          "lineIndex": 10,
+          "start": 41.635,
+          "end": 45.511
+        },
+        {
+          "lineIndex": 11,
+          "start": 46.069,
+          "end": 49.526
+        },
+        {
+          "lineIndex": 12,
+          "start": 50.084,
+          "end": 53.541
+        },
+        {
+          "lineIndex": 13,
+          "start": 54.099,
+          "end": 57.556
+        },
+        {
+          "lineIndex": 14,
+          "start": 58.114,
+          "end": 61.571
+        },
+        {
+          "lineIndex": 15,
+          "start": 62.129,
+          "end": 65.586
+        },
+        {
+          "lineIndex": 16,
+          "start": 66.144,
+          "end": 69.601
+        },
+        {
+          "lineIndex": 17,
+          "start": 70.159,
+          "end": 74.035
+        },
+        {
+          "lineIndex": 18,
+          "start": 74.593,
+          "end": 78.05
+        },
+        {
+          "lineIndex": 19,
+          "start": 78.608,
+          "end": 82.483
+        },
+        {
+          "lineIndex": 20,
+          "start": 83.041,
+          "end": 86.498
+        },
+        {
+          "lineIndex": 21,
+          "start": 87.056,
+          "end": 90.513
+        },
+        {
+          "lineIndex": 22,
+          "start": 91.071,
+          "end": 94.528
+        },
+        {
+          "lineIndex": 23,
+          "start": 95.086,
+          "end": 98.962
+        }
+      ]
+    },
+    {
+      "id": "the-tyger--hymn-alto",
+      "chunkId": "the-tyger",
+      "presetId": "hymn-alto",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-tyger/hymn-alto.168e23876071c29e.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 523627,
+          "sha256": "168e23876071c29eaa88f5592af9370b16a4b2c8849b78c6e03d36c895d267d9"
+        },
+        {
+          "path": "library/blake-songs/the-tyger/hymn-alto.be48ac4eb51eeb34.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 797794,
+          "sha256": "be48ac4eb51eeb34a68126f75262b4e20e642286f869efd4510febf46e14778a"
+        }
+      ],
+      "durationSeconds": 128.107,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.463,
+          "end": 5.799
+        },
+        {
+          "lineIndex": 1,
+          "start": 6.53,
+          "end": 10.866
+        },
+        {
+          "lineIndex": 2,
+          "start": 11.598,
+          "end": 15.933
+        },
+        {
+          "lineIndex": 3,
+          "start": 16.665,
+          "end": 21.549
+        },
+        {
+          "lineIndex": 4,
+          "start": 22.28,
+          "end": 26.616
+        },
+        {
+          "lineIndex": 5,
+          "start": 27.348,
+          "end": 31.134
+        },
+        {
+          "lineIndex": 6,
+          "start": 31.866,
+          "end": 36.201
+        },
+        {
+          "lineIndex": 7,
+          "start": 36.933,
+          "end": 41.268
+        },
+        {
+          "lineIndex": 8,
+          "start": 42,
+          "end": 46.335
+        },
+        {
+          "lineIndex": 9,
+          "start": 47.067,
+          "end": 51.951
+        },
+        {
+          "lineIndex": 10,
+          "start": 52.683,
+          "end": 57.567
+        },
+        {
+          "lineIndex": 11,
+          "start": 58.299,
+          "end": 62.634
+        },
+        {
+          "lineIndex": 12,
+          "start": 63.366,
+          "end": 67.701
+        },
+        {
+          "lineIndex": 13,
+          "start": 68.433,
+          "end": 72.768
+        },
+        {
+          "lineIndex": 14,
+          "start": 73.5,
+          "end": 77.835
+        },
+        {
+          "lineIndex": 15,
+          "start": 78.567,
+          "end": 82.902
+        },
+        {
+          "lineIndex": 16,
+          "start": 83.634,
+          "end": 87.97
+        },
+        {
+          "lineIndex": 17,
+          "start": 88.701,
+          "end": 93.585
+        },
+        {
+          "lineIndex": 18,
+          "start": 94.317,
+          "end": 98.652
+        },
+        {
+          "lineIndex": 19,
+          "start": 99.384,
+          "end": 104.268
+        },
+        {
+          "lineIndex": 20,
+          "start": 105,
+          "end": 109.335
+        },
+        {
+          "lineIndex": 21,
+          "start": 110.067,
+          "end": 114.402
+        },
+        {
+          "lineIndex": 22,
+          "start": 115.134,
+          "end": 119.47
+        },
+        {
+          "lineIndex": 23,
+          "start": 120.201,
+          "end": 125.085
+        }
+      ]
+    },
+    {
+      "id": "the-tyger--hymn-treble",
+      "chunkId": "the-tyger",
+      "presetId": "hymn-treble",
+      "status": "published",
+      "sources": [
+        {
+          "path": "library/blake-songs/the-tyger/hymn-treble.cb53f563ae06756f.webm",
+          "mimeType": "audio/webm; codecs=\"opus\"",
+          "codec": "opus",
+          "bitrateKbps": 32,
+          "bytes": 559377,
+          "sha256": "cb53f563ae06756fad10d78d11f7d8475294f274ed44e553735e6d05a6ce5e45"
+        },
+        {
+          "path": "library/blake-songs/the-tyger/hymn-treble.63ad9657cc9cb0c6.m4a",
+          "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+          "codec": "aac",
+          "bitrateKbps": 48,
+          "bytes": 761129,
+          "sha256": "63ad9657cc9cb0c611576e7449177ffe883e67df5fa376911ff80fa366d65bb9"
+        }
+      ],
+      "durationSeconds": 122.007,
+      "alignment": [
+        {
+          "lineIndex": 0,
+          "start": 1.394,
+          "end": 5.523
+        },
+        {
+          "lineIndex": 1,
+          "start": 6.22,
+          "end": 10.348
+        },
+        {
+          "lineIndex": 2,
+          "start": 11.045,
+          "end": 15.174
+        },
+        {
+          "lineIndex": 3,
+          "start": 15.871,
+          "end": 20.523
+        },
+        {
+          "lineIndex": 4,
+          "start": 21.22,
+          "end": 25.348
+        },
+        {
+          "lineIndex": 5,
+          "start": 26.045,
+          "end": 29.652
+        },
+        {
+          "lineIndex": 6,
+          "start": 30.348,
+          "end": 34.477
+        },
+        {
+          "lineIndex": 7,
+          "start": 35.174,
+          "end": 39.303
+        },
+        {
+          "lineIndex": 8,
+          "start": 40,
+          "end": 44.129
+        },
+        {
+          "lineIndex": 9,
+          "start": 44.826,
+          "end": 49.477
+        },
+        {
+          "lineIndex": 10,
+          "start": 50.174,
+          "end": 54.826
+        },
+        {
+          "lineIndex": 11,
+          "start": 55.523,
+          "end": 59.652
+        },
+        {
+          "lineIndex": 12,
+          "start": 60.348,
+          "end": 64.477
+        },
+        {
+          "lineIndex": 13,
+          "start": 65.174,
+          "end": 69.303
+        },
+        {
+          "lineIndex": 14,
+          "start": 70,
+          "end": 74.129
+        },
+        {
+          "lineIndex": 15,
+          "start": 74.826,
+          "end": 78.955
+        },
+        {
+          "lineIndex": 16,
+          "start": 79.652,
+          "end": 83.78
+        },
+        {
+          "lineIndex": 17,
+          "start": 84.477,
+          "end": 89.129
+        },
+        {
+          "lineIndex": 18,
+          "start": 89.826,
+          "end": 93.955
+        },
+        {
+          "lineIndex": 19,
+          "start": 94.652,
+          "end": 99.303
+        },
+        {
+          "lineIndex": 20,
+          "start": 100,
+          "end": 104.129
+        },
+        {
+          "lineIndex": 21,
+          "start": 104.826,
+          "end": 108.955
+        },
+        {
+          "lineIndex": 22,
+          "start": 109.652,
+          "end": 113.78
+        },
+        {
+          "lineIndex": 23,
+          "start": 114.477,
+          "end": 119.129
+        }
+      ]
+    }
+  ],
+  "generatedAt": "2026-09-19T22:03:20.451Z",
+  "contentHash": "9f08487354b51444f0058859796cf8708d1a3dd2672415d1505043fd2f05d50d"
+}

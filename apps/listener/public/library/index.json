@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-19T22:03:20.451Z",
+  "corpora": [
+    {
+      "id": "blake-songs",
+      "title": "Songs of Innocence and of Experience",
+      "author": "William Blake",
+      "path": "library/blake-songs/catalogue.json",
+      "trackCount": 40,
+      "chunkCount": 10
+    }
+  ]
+}
