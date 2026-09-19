@@ -1,0 +1,39 @@
+{
+  "name": "refrain",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Refrain — a static-first PWA that streams a pre-rendered audio library of public-domain text, with a batch render pipeline and a private QC studio.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace @refrain/catalogue && npm run build --workspace @refrain/pipeline && npm run build --workspace @refrain/listener",
+    "build:listener": "npm run build --workspace @refrain/listener",
+    "typecheck": "tsc -b packages/catalogue packages/pipeline && npm run typecheck --workspace @refrain/listener",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "pipeline": "node --enable-source-maps packages/pipeline/dist/cli.js",
+    "studio": "npm run dev --workspace @refrain/studio",
+    "dev": "npm run dev --workspace @refrain/listener",
+    "pilot": "npm run build --workspace @refrain/catalogue && npm run build --workspace @refrain/pipeline && node packages/pipeline/dist/cli.js pilot",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^2.1.8",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^15.13.0",
+    "playwright": "^1.49.1",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0",
+    "vitest": "^2.1.8"
+  }
+}
