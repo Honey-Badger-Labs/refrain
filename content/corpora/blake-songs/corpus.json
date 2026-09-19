@@ -1,0 +1,24 @@
+{
+  "corpus": {
+    "id": "blake-songs",
+    "title": "Songs of Innocence and of Experience",
+    "edition": "Text of the 1789 and 1794 illuminated printings, as reproduced in modern public-domain editions",
+    "author": "William Blake",
+    "year": 1794,
+    "licence": {
+      "id": "public-domain",
+      "name": "Public domain",
+      "note": "William Blake died in 1827, so the work and this text are out of copyright worldwide. No modern editor's apparatus, notes or emendations are included: only the poems themselves. Where printings differ in punctuation, the reading given here is the plain one, recorded so a later correction can be traced."
+    },
+    "sourceUrl": "https://www.gutenberg.org/ebooks/1934",
+    "description": "Ten short poems, the pilot corpus. Chosen over a 150-chapter book because short, metrical, strongly rhythmic text is the hardest case for word accuracy and the easiest case for a reviewer to judge quickly.",
+    "books": [
+      { "id": "innocence", "title": "Songs of Innocence", "order": 0 },
+      { "id": "experience", "title": "Songs of Experience", "order": 1 }
+    ]
+  },
+  "bookOf": {
+    "innocence": "innocence",
+    "experience": "experience"
+  }
+}

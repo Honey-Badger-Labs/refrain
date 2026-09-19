@@ -1,0 +1,66 @@
+{
+  "styles": [
+    {
+      "id": "hymn",
+      "name": "Hymn",
+      "description": "Slow, three beats to the bar, sustained chords under a stepwise line."
+    },
+    {
+      "id": "folk",
+      "name": "Folk",
+      "description": "Brisker, four beats to the bar, a plucked accompaniment and a wider melody."
+    }
+  ],
+  "voices": [
+    {
+      "id": "alto",
+      "name": "Alto",
+      "source": "synthetic: additive synthesis in this repository, no human voice sampled or modelled",
+      "description": "Lower register, warmer harmonics."
+    },
+    {
+      "id": "treble",
+      "name": "Treble",
+      "source": "synthetic: additive synthesis in this repository, no human voice sampled or modelled",
+      "description": "An octave up, brighter."
+    }
+  ],
+  "presets": [
+    {
+      "id": "hymn-alto",
+      "mode": "sung",
+      "styleId": "hymn",
+      "voiceId": "alto",
+      "adapter": "synth",
+      "params": { "tempoScale": 1 },
+      "modelId": "refrain-synth"
+    },
+    {
+      "id": "hymn-treble",
+      "mode": "sung",
+      "styleId": "hymn",
+      "voiceId": "treble",
+      "adapter": "synth",
+      "params": { "tempoScale": 1.05 },
+      "modelId": "refrain-synth"
+    },
+    {
+      "id": "folk-alto",
+      "mode": "sung",
+      "styleId": "folk",
+      "voiceId": "alto",
+      "adapter": "synth",
+      "params": { "tempoScale": 1 },
+      "modelId": "refrain-synth"
+    },
+    {
+      "id": "folk-treble",
+      "mode": "sung",
+      "styleId": "folk",
+      "voiceId": "treble",
+      "adapter": "synth",
+      "params": { "tempoScale": 0.96 },
+      "modelId": "refrain-synth"
+    }
+  ]
+}

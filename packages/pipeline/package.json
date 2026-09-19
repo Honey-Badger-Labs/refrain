@@ -1,0 +1,19 @@
+{
+  "name": "@refrain/pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The batch pipeline: ingest, chunk, lyric prep, render, auto checks and publish. Runs offline, never at listen time.",
+  "bin": {
+    "refrain": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@refrain/catalogue": "*"
+  }
+}
