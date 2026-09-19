@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Refrain studio — review queue</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0d0f18;
+        --panel: #161826;
+        --line: #2a2e45;
+        --text: #e7e9f2;
+        --muted: #9aa0b8;
+        --ember: #e39a2f;
+        --good: #6fb89e;
+        --bad: #e2726e;
+        font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--text); }
+      #root { display: grid; grid-template-columns: 320px 1fr; min-height: 100vh; }
+      @media (max-width: 800px) { #root { grid-template-columns: 1fr; } }
+      button { font: inherit; cursor: pointer; }
+      kbd {
+        background: var(--line); border-radius: 4px; padding: 1px 6px;
+        font-family: ui-monospace, monospace; font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

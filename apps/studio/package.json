@@ -1,0 +1,25 @@
+{
+  "name": "@refrain/studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The private QC studio. Runs on a reviewer's machine against the local store; never deployed with the public app.",
+  "scripts": {
+    "dev": "node server.mjs & vite",
+    "serve": "node server.mjs",
+    "ui": "vite",
+    "build": "vite build",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@refrain/catalogue": "*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.17",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}
