@@ -13,6 +13,7 @@ import {
 } from '../src/render/http.js';
 import { encodeWav } from '../src/audio/wav.js';
 import { summarise } from '../src/commands/bakeoff.js';
+import { hasFfmpeg } from './helpers/ffmpeg.js';
 
 const vars = {
   apiKey: 'secret',
@@ -113,6 +114,9 @@ describe('validateProviderConfig', () => {
   });
 });
 
+// These three decode the provider's audio, which runs it through ffmpeg.
+const itWithAudio = it.skipIf(!hasFfmpeg);
+
 describe('the HTTP adapter', () => {
   let workDir: string;
   let wav: Buffer;
@@ -162,7 +166,7 @@ describe('the HTTP adapter', () => {
     response: { kind: 'audio' },
   };
 
-  it('posts the interpolated body and decodes the audio it gets back', async () => {
+  itWithAudio('posts the interpolated body and decodes the audio it gets back', async () => {
     const fetchImpl = vi.fn(async () => new Response(wav, { status: 200 }));
     const adapter = createHttpAdapter(audioConfig, {
       workDir,
@@ -184,7 +188,7 @@ describe('the HTTP adapter', () => {
     expect((init.headers as Record<string, string>)['xi-api-key']).toBe('secret-value');
   });
 
-  it('returns no alignment rather than inventing one', async () => {
+  itWithAudio('returns no alignment rather than inventing one', async () => {
     const fetchImpl = vi.fn(async () => new Response(wav, { status: 200 }));
     const adapter = createHttpAdapter(audioConfig, {
       workDir,
@@ -214,7 +218,7 @@ describe('the HTTP adapter', () => {
     await expect(adapter.render(request)).rejects.toThrow(/429.*quota exhausted/s);
   });
 
-  it('polls a job until it is done, then downloads the audio', async () => {
+  itWithAudio('polls a job until it is done, then downloads the audio', async () => {
     const pollConfig: ProviderConfig = {
       ...audioConfig,
       name: 'x-poll',

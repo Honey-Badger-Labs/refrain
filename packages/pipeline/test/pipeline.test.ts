@@ -11,6 +11,10 @@ import { verify } from '../src/commands/verify.js';
 import { JsonStore } from '../src/store.js';
 import { registerAdapter } from '../src/render/types.js';
 import { synthAdapter } from '../src/render/synth.js';
+import { hasFfmpeg } from './helpers/ffmpeg.js';
+
+// Every suite below reads the fixture that beforeAll renders.
+const describeWithAudio = describe.skipIf(!hasFfmpeg);
 
 registerAdapter(synthAdapter);
 
@@ -63,6 +67,7 @@ beforeAll(async () => {
     'First Poem\n\nA short first line\nAnd another line here\n',
   );
 
+  if (!hasFfmpeg) return;
   await ingest({ root });
   await render({ root, formats: ['opus'] });
 }, 120_000);
@@ -73,7 +78,7 @@ afterAll(() => {
 
 const store = () => new JsonStore(path.join(root, 'data', 'store.json')).read();
 
-describe('ingest', () => {
+describeWithAudio('ingest', () => {
   it('numbers chunks by the order in the file name, not the alphabet', () => {
     const chunks = store().chunks;
     expect(chunks.find((c) => c.id === 'first-poem')?.number).toBe(1);
@@ -85,7 +90,7 @@ describe('ingest', () => {
   });
 });
 
-describe('render', () => {
+describeWithAudio('render', () => {
   it('writes candidates under work/, never under the public library', () => {
     const candidates = path.join(root, 'work', 'candidates', 'tiny');
     expect(fs.readdirSync(candidates).filter((f) => f.endsWith('.webm'))).toHaveLength(2);
@@ -110,7 +115,7 @@ describe('render', () => {
   }, 60_000);
 });
 
-describe('the human gate', () => {
+describeWithAudio('the human gate', () => {
   it('refuses to publish a candidate nobody approved', async () => {
     await expect(publish({ root })).rejects.toThrow(/nothing was publishable/);
   });
@@ -143,7 +148,7 @@ describe('the human gate', () => {
   });
 });
 
-describe('publish and verify', () => {
+describeWithAudio('publish and verify', () => {
   it('publishes only what a person approved', async () => {
     recordVerdict({
       root,

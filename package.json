@@ -2,7 +2,7 @@
   "name": "refrain",
   "version": "0.1.0",
   "private": true,
-  "description": "Refrain — a static-first PWA that streams a pre-rendered audio library of public-domain text, with a batch render pipeline and a private QC studio.",
+  "description": "Refrain \u2014 a static-first PWA that streams a pre-rendered audio library of public-domain text, with a batch render pipeline and a private QC studio.",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -16,6 +16,7 @@
     "build": "npm run build --workspace @refrain/catalogue && npm run build --workspace @refrain/pipeline && npm run build --workspace @refrain/listener",
     "build:listener": "npm run build --workspace @refrain/listener",
     "typecheck": "tsc -b packages/catalogue packages/pipeline && npm run typecheck --workspace @refrain/listener",
+    "pretest": "npm run build --workspace @refrain/pipeline",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
