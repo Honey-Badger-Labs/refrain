@@ -22,3 +22,6 @@ coverage/
 playwright-report/
 test-results/
 smoke-shots/
+
+# Bake-off output: renders you paid for, kept locally, never published.
+work/bakeoff/

@@ -64,9 +64,23 @@ refrain reject       record a human verdict and why
 refrain publish      copy approved audio into the library, write catalogue.json
 refrain verify       parse, re-hash and re-check everything in the published library
 refrain status       where the pilot stands
+refrain bakeoff      compare music models on word accuracy and cost per usable track
 ```
 
 `docs/PIPELINE.md` has the detail, including how to plug in a real model.
+
+### The next decision
+
+Everything here runs on placeholder audio. The question that decides whether the library is worth
+building for real — does any available music model sing the words accurately enough? — is answered
+by `refrain bakeoff`, which renders the same poems across several providers, measures word accuracy
+with transcribe-and-diff, and reports cost per *usable* track against a hard budget.
+
+```bash
+npm run pipeline -- bakeoff --dry-run    # the prompt and the cost, nothing sent
+```
+
+`docs/BAKEOFF.md` is the runbook, including the gate that says what each outcome means.
 
 ## Design principles
 

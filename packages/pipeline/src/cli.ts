@@ -8,6 +8,8 @@ import { autoApprove, recordVerdict } from './commands/review.js';
 import { publish } from './commands/publish.js';
 import { verify } from './commands/verify.js';
 import { status } from './commands/status.js';
+import { bakeoff, loadProviders } from './commands/bakeoff.js';
+import { registerProviders } from './render/providers.js';
 import { registerAdapter, listAdapters } from './render/types.js';
 import { synthAdapter } from './render/synth.js';
 
@@ -26,7 +28,10 @@ const USAGE = `refrain — the Refrain batch pipeline
   refrain verify                             check the published library
   refrain status                             where the pilot stands
   refrain pilot                              ingest, render, auto-approve, publish, verify
-  refrain adapters                           list render adapters
+  refrain bakeoff  [--providers a,b] [--chunks x,y] [--runs 2] [--budget 15]
+                   [--style hymn] [--voice alto] [--dry-run]
+                   compare music models on word accuracy and cost
+  refrain adapters                           list render adapters and providers
 
 Candidates never leave work/candidates until publish copies them.
 `;
@@ -52,6 +57,13 @@ async function main(argv: string[]): Promise<number> {
       seed: { type: 'string' },
       transcriber: { type: 'string' },
       formats: { type: 'string' },
+      providers: { type: 'string' },
+      chunks: { type: 'string' },
+      runs: { type: 'string' },
+      budget: { type: 'string' },
+      style: { type: 'string' },
+      voice: { type: 'string' },
+      'dry-run': { type: 'boolean' },
       force: { type: 'boolean' },
       'allow-auto': { type: 'boolean' },
       root: { type: 'string' },
@@ -130,9 +142,38 @@ async function main(argv: string[]): Promise<number> {
       log(status({ root }));
       return 0;
 
-    case 'adapters':
-      for (const adapter of listAdapters()) log(`${adapter.name.padEnd(10)} ${adapter.description}`);
+    case 'bakeoff':
+      log(
+        await bakeoff({
+          root,
+          providers: values.providers?.split(',').map((p) => p.trim()),
+          chunks: values.chunks?.split(',').map((c) => c.trim()),
+          runs: values.runs === undefined ? undefined : numeric(values.runs, '--runs'),
+          budgetUsd: values.budget === undefined ? undefined : numeric(values.budget, '--budget'),
+          seed: values.seed === undefined ? undefined : numeric(values.seed, '--seed'),
+          styleId: values.style,
+          voiceId: values.voice,
+          transcriber: values.transcriber,
+          dryRun: values['dry-run'] === true,
+          onProgress: log,
+        }),
+      );
       return 0;
+
+    case 'adapters': {
+      registerProviders(root);
+      for (const adapter of listAdapters()) log(`${adapter.name.padEnd(18)} ${adapter.description}`);
+      const providers = loadProviders(root);
+      if (providers.length > 0) {
+        log('');
+        for (const provider of providers) {
+          log(
+            `${provider.config.name.padEnd(18)} ${provider.ready ? 'key present' : `needs ${provider.config.apiKeyEnv}`} · $${provider.config.costPerRenderUsd.toFixed(2)}/render · commercial use ${provider.config.modelTerms.commercialUse ? 'declared' : 'NOT confirmed'}`,
+          );
+        }
+      }
+      return 0;
+    }
 
     case 'pilot': {
       log(await ingest({ root }));

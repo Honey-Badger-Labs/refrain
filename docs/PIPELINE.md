@@ -98,6 +98,11 @@ registerAdapter({
 
 Nothing else changes: the same checks run, the same gate applies, the same catalogue comes out.
 
+For a provider that speaks plain HTTP, there is no need to write an adapter at all: drop a JSON
+config into `content/providers/` describing where to post, what to send and where the audio comes
+back, and `createHttpAdapter` builds one. That is how the bake-off compares contenders without the
+comparison turning into a comparison of hand-written clients. See `docs/BAKEOFF.md`.
+
 ### Alignment for real renders
 
 The synth adapter knows its own timings. A model does not, and speech aligners struggle on sung

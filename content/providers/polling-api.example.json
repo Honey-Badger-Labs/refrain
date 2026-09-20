@@ -1,0 +1,42 @@
+{
+  "name": "example-polling-api",
+  "description": "Template for a provider that returns a job to poll — the shape most Suno-style wrappers use. Copy this, drop the .example, and fill in the paths from that provider's own docs.",
+  "apiKeyEnv": "EXAMPLE_API_KEY",
+  "costPerRenderUsd": 0.05,
+  "modelId": "their-model-name",
+  "modelTerms": {
+    "url": "https://example.com/terms",
+    "version": "",
+    "checkedOn": "",
+    "commercialUse": false
+  },
+  "promptTemplate": "A {{style}} setting of \"{{title}}\", one {{voice}} voice, every word sung exactly as written.\n\n{{lyrics}}",
+  "request": {
+    "url": "https://api.example.com/v1/generate",
+    "method": "POST",
+    "headers": {
+      "authorization": "Bearer {{apiKey}}"
+    },
+    "body": {
+      "prompt": "{{prompt}}",
+      "lyrics": "{{lyrics}}",
+      "duration": "{{durationSeconds}}",
+      "seed": "{{seed}}",
+      "make_instrumental": false
+    }
+  },
+  "response": {
+    "kind": "json",
+    "idPath": "data.id",
+    "statusUrl": "https://api.example.com/v1/generate/{{id}}",
+    "statusHeaders": {
+      "authorization": "Bearer {{apiKey}}"
+    },
+    "statusPath": "data.status",
+    "doneValues": ["complete", "succeeded"],
+    "failValues": ["failed", "error"],
+    "audioUrlPath": "data.audio_url",
+    "intervalMs": 5000,
+    "timeoutMs": 420000
+  }
+}

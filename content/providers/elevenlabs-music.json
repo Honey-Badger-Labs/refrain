@@ -1,0 +1,30 @@
+{
+  "name": "elevenlabs-music",
+  "description": "ElevenLabs Music. Answers with the audio bytes directly and accepts a seed, which keeps a render reproducible.",
+  "apiKeyEnv": "ELEVENLABS_API_KEY",
+  "costPerRenderUsd": 0.1,
+  "modelId": "music_v1",
+  "modelTerms": {
+    "url": "https://elevenlabs.io/terms-of-use",
+    "version": "check before the bake-off",
+    "checkedOn": "",
+    "commercialUse": false
+  },
+  "request": {
+    "url": "https://api.elevenlabs.io/v1/music",
+    "method": "POST",
+    "headers": {
+      "xi-api-key": "{{apiKey}}"
+    },
+    "body": {
+      "prompt": "{{prompt}}",
+      "music_length_ms": "{{durationMs}}",
+      "model_id": "music_v1",
+      "seed": "{{seed}}",
+      "output_format": "mp3_44100_128"
+    }
+  },
+  "response": {
+    "kind": "audio"
+  }
+}

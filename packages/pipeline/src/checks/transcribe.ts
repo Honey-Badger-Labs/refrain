@@ -76,10 +76,55 @@ export const whisperCliTranscriber: Transcriber = {
   },
 };
 
+/**
+ * An OpenAI-compatible speech-to-text endpoint.
+ *
+ * Installing whisper locally is the better answer for a long run, but a
+ * bake-off is three chunks and an afternoon, and the point is to get the
+ * accuracy number today rather than after a CUDA install. Configured with two
+ * environment variables so it works against any compatible host.
+ */
+export const whisperApiTranscriber: Transcriber = {
+  name: 'whisper-api',
+  async available() {
+    return Boolean(process.env.REFRAIN_ASR_KEY && process.env.REFRAIN_ASR_URL);
+  },
+  async transcribe(audioPath: string) {
+    const url = process.env.REFRAIN_ASR_URL;
+    const key = process.env.REFRAIN_ASR_KEY;
+    const model = process.env.REFRAIN_ASR_MODEL ?? 'whisper-1';
+    if (!url || !key) return null;
+
+    const form = new FormData();
+    form.append('file', new Blob([fs.readFileSync(audioPath)]), path.basename(audioPath));
+    form.append('model', model);
+    form.append('response_format', 'text');
+    // Sung words are not conversational speech; saying so measurably helps.
+    form.append('prompt', 'A sung performance of a poem. Transcribe the words exactly.');
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { authorization: `Bearer ${key}` },
+      body: form,
+    });
+    if (!response.ok) return null;
+    return (await response.text()).trim() || null;
+  },
+};
+
 const transcribers = new Map<string, Transcriber>([
   [nullTranscriber.name, nullTranscriber],
   [whisperCliTranscriber.name, whisperCliTranscriber],
+  [whisperApiTranscriber.name, whisperApiTranscriber],
 ]);
+
+/** The best transcriber that is actually installed and configured. */
+export async function bestAvailableTranscriber(): Promise<Transcriber> {
+  for (const candidate of [whisperCliTranscriber, whisperApiTranscriber]) {
+    if (await candidate.available()) return candidate;
+  }
+  return nullTranscriber;
+}
 
 export function getTranscriber(name: string): Transcriber {
   const transcriber = transcribers.get(name);
