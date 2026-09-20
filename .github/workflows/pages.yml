@@ -28,6 +28,12 @@ jobs:
 
       - run: npm ci
 
+      # `refrain verify` runs from packages/pipeline/dist, which npm ci does not
+      # produce. CI only gets away with skipping this because its typecheck step
+      # emits the same output on the way past; the gate below needs it outright.
+      - name: Build the pipeline
+        run: npm run build --workspace @refrain/pipeline
+
       # Nothing is deployed that has not been verified: a catalogue that does
       # not match its own hash, or a missing audio file, fails here.
       - name: Verify the published library
