@@ -29,7 +29,7 @@ const USAGE = `refrain — the Refrain batch pipeline
   refrain status                             where the pilot stands
   refrain pilot                              ingest, render, auto-approve, publish, verify
   refrain bakeoff  [--providers a,b] [--chunks x,y] [--runs 2] [--budget 15]
-                   [--style hymn] [--voice alto] [--dry-run]
+                   [--style hymn] [--voice alto] [--dry-run] [--allow-unscored]
                    compare music models on word accuracy and cost
   refrain adapters                           list render adapters and providers
 
@@ -58,6 +58,7 @@ async function main(argv: string[]): Promise<number> {
       transcriber: { type: 'string' },
       formats: { type: 'string' },
       providers: { type: 'string' },
+      'allow-unscored': { type: 'boolean' },
       chunks: { type: 'string' },
       runs: { type: 'string' },
       budget: { type: 'string' },
@@ -154,6 +155,7 @@ async function main(argv: string[]): Promise<number> {
           styleId: values.style,
           voiceId: values.voice,
           transcriber: values.transcriber,
+          allowUnscored: values['allow-unscored'] === true,
           dryRun: values['dry-run'] === true,
           onProgress: log,
         }),

@@ -36,6 +36,8 @@ export interface BakeoffOptions {
   /** Hard ceiling in US dollars. The run stops rather than passing it. */
   budgetUsd?: number;
   transcriber?: string;
+  /** Spend money on renders nobody can score. Deliberate, and off by default. */
+  allowUnscored?: boolean;
   styleId?: string;
   voiceId?: string;
   dryRun?: boolean;
@@ -134,8 +136,18 @@ export async function bakeoff(options: BakeoffOptions = {}): Promise<string> {
     : await bestAvailableTranscriber();
   const transcriberReady = await transcriber.available();
   if (!transcriberReady || transcriber.name === 'none') {
+    // A bake-off with no transcriber bills for audio and answers nothing: the
+    // question it exists to settle is word accuracy. Warning and charging on
+    // is the same mistake as a check that reports `pass` when it could not
+    // run, so this refuses instead. --allow-unscored is there for the case
+    // where the audio itself is the point.
+    if (!options.allowUnscored) {
+      throw new Error(
+        'no transcriber is available, so word accuracy — the number this bake-off exists to produce — cannot be measured, and the renders would cost money without answering anything. Install whisper (whisper-cli or whisper on PATH), or set REFRAIN_ASR_URL and REFRAIN_ASR_KEY. Pass --allow-unscored to render anyway.',
+      );
+    }
     progress(
-      'No transcriber is available, so word accuracy — the number this bake-off exists to produce — will not be measured. Install whisper, or set REFRAIN_ASR_URL and REFRAIN_ASR_KEY.',
+      'No transcriber is available, so word accuracy will not be measured. Continuing because --allow-unscored was passed.',
     );
   }
 
