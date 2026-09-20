@@ -9,9 +9,13 @@ about the price of a lunch.
 ## Before you spend anything
 
 ```bash
+npm ci && npm run build               # `npm run pipeline` runs dist/, which npm ci does not create
 npm run pipeline -- adapters          # what is configured, and whether its key is set
 npm run pipeline -- bakeoff --dry-run # the exact prompt, the exact cost, nothing sent
 ```
+
+Skip the build and the first command fails with `Cannot find module .../pipeline/dist/cli.js`,
+which reads like a broken checkout rather than a missing step.
 
 The dry run prints the prompt that would go to the provider. Read it. A bad prompt is the most
 common reason a bake-off produces a number that means nothing, and it is free to fix at this point.
@@ -38,13 +42,19 @@ output is non-commercial only, while a paid subscriber "is considered the owner 
 commercial rights that survive cancellation — and the terms were adjusted after its Warner
 partnership, so read the current version rather than a summary.
 
-**3. Set the keys.**
+**3. Set the keys.** In the environment — nothing here reads `.env`.
 
 ```bash
 export ELEVENLABS_API_KEY=...
 export REFRAIN_ASR_URL=https://api.openai.com/v1/audio/transcriptions
 export REFRAIN_ASR_KEY=...
 ```
+
+`.env.example` exists for the shape of the variables, not as a file the pipeline loads: the CLI
+reads `process.env` and there is no dotenv dependency. A key written into `.env` and left there
+produces `Missing keys:` on the dry run, with the key sitting in front of you looking correct. To
+keep using the file, load it yourself — `set -a; . ./.env; set +a`, or run the CLI directly with
+`node --env-file=.env packages/pipeline/dist/cli.js bakeoff --dry-run`.
 
 Without an ASR endpoint (or a local `whisper-cli`), the run produces audio and **no accuracy
 number** — which is the one thing it exists to produce. The command says so rather than quietly
