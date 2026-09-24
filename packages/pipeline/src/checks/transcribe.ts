@@ -1,5 +1,6 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import { encodeWav } from '../audio/wav.js';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -37,42 +38,142 @@ export const nullTranscriber: Transcriber = {
 };
 
 /**
- * Shells out to a local whisper build when one is installed. Used for real
- * renders; absent in CI, where it reports itself unavailable rather than
- * silently passing tracks.
+ * Shells out to a local whisper build when one is installed.
+ *
+ * Two different programs answer to these names, and they do not share a
+ * command line. `whisper` is the Python package (`--output_format txt
+ * --output_dir DIR`, downloads its own weights). `whisper-cli` is whisper.cpp,
+ * which is what `brew install whisper-cpp` puts on the PATH, and it wants
+ * `-m MODEL -f AUDIO -otxt -of PREFIX` with weights the user supplies.
+ *
+ * Presence is therefore not capability, and the difference costs money: this
+ * adapter is the gate `refrain bakeoff` checks before it starts paying a music
+ * model. An `available()` that only proved a binary existed would open the gate
+ * for a whisper.cpp install, spend the budget, fail every invocation on
+ * unrecognised flags, and report word accuracy as unknown for the whole run —
+ * invariant 2 broken from the other side, by a check that could not run but
+ * said it could. So `available()` here drives the real invocation against a
+ * generated probe clip and believes only an output file.
  */
+type WhisperDialect = 'openai' | 'cpp';
+
+interface WhisperCli {
+  bin: string;
+  dialect: WhisperDialect;
+  /** whisper.cpp needs weights named explicitly; the Python CLI fetches its own. */
+  model?: string;
+}
+
+const WHISPER_BINARIES = ['whisper-cli', 'whisper', 'whisper-cpp'];
+
+/** The sample rate whisper.cpp accepts. Anything else makes it exit rather than resample. */
+const PROBE_SAMPLE_RATE = 16000;
+
+async function helpText(bin: string): Promise<string | null> {
+  try {
+    const { stdout, stderr } = await run(bin, ['--help'], { maxBuffer: 4 * 1024 * 1024 });
+    return `${stdout}\n${stderr}`;
+  } catch (error) {
+    // whisper.cpp prints its usage and exits non-zero. That is still an answer.
+    const failed = error as { stdout?: string; stderr?: string };
+    const text = `${failed.stdout ?? ''}\n${failed.stderr ?? ''}`.trim();
+    return text || null;
+  }
+}
+
+function dialectOf(help: string): WhisperDialect | null {
+  if (/--output_format|--output_dir/.test(help)) return 'openai';
+  if (/-otxt|--output-txt|-m\s+FNAME|--model\s+FNAME/.test(help)) return 'cpp';
+  return null;
+}
+
+/**
+ * Where whisper.cpp weights tend to live. Homebrew ships the binary without
+ * them, so an install that looks complete usually is not.
+ */
+function cppModel(): string | null {
+  const explicit = process.env.WHISPER_MODEL;
+  if (explicit && fs.existsSync(explicit)) return explicit;
+
+  const dirs = [
+    path.join(os.homedir(), '.cache', 'whisper'),
+    path.join(os.homedir(), '.local', 'share', 'whisper-cpp'),
+    '/opt/homebrew/share/whisper-cpp/models',
+    '/usr/local/share/whisper-cpp/models',
+  ];
+  for (const dir of dirs) {
+    try {
+      const file = fs.readdirSync(dir).find((f) => f.startsWith('ggml-') && f.endsWith('.bin'));
+      if (file) return path.join(dir, file);
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+
+async function resolveWhisper(): Promise<WhisperCli | null> {
+  for (const bin of WHISPER_BINARIES) {
+    const help = await helpText(bin);
+    if (!help) continue;
+    const dialect = dialectOf(help);
+    if (!dialect) continue;
+    if (dialect === 'openai') return { bin, dialect };
+    const model = cppModel();
+    // A whisper.cpp with no weights cannot transcribe. Keep looking rather than
+    // claiming it can: another binary on the PATH may be the Python one.
+    if (model) return { bin, dialect, model };
+  }
+  return null;
+}
+
+async function runWhisper(cli: WhisperCli, audioPath: string, outDir: string): Promise<string | null> {
+  const args =
+    cli.dialect === 'openai'
+      ? [audioPath, '--output_format', 'txt', '--output_dir', outDir]
+      : ['-m', cli.model as string, '-f', audioPath, '-otxt', '-of', path.join(outDir, 'out')];
+  try {
+    await run(cli.bin, args, { maxBuffer: 32 * 1024 * 1024 });
+  } catch {
+    return null;
+  }
+  const file = fs.readdirSync(outDir).find((f) => f.endsWith('.txt'));
+  return file ? fs.readFileSync(path.join(outDir, file), 'utf8') : null;
+}
+
+async function withTempDir<T>(body: (dir: string) => Promise<T>): Promise<T> {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'refrain-asr-'));
+  try {
+    return await body(dir);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+}
+
 export const whisperCliTranscriber: Transcriber = {
   name: 'whisper-cli',
   async available() {
-    for (const bin of ['whisper-cli', 'whisper']) {
-      try {
-        await run(bin, ['--help']);
-        return true;
-      } catch {
-        continue;
-      }
+    const cli = await resolveWhisper();
+    if (!cli) return false;
+    // A second of quiet tone. Whisper will find no words in it, and that is
+    // fine: what is being tested is whether this command line runs at all.
+    const samples = new Float32Array(PROBE_SAMPLE_RATE);
+    for (let i = 0; i < samples.length; i++) {
+      samples[i] = 0.05 * Math.sin((2 * Math.PI * 220 * i) / PROBE_SAMPLE_RATE);
     }
-    return false;
+    return withTempDir(async (dir) => {
+      const probe = path.join(dir, 'probe.wav');
+      fs.writeFileSync(probe, encodeWav(samples, { sampleRate: PROBE_SAMPLE_RATE }));
+      return (await runWhisper(cli, probe, dir)) !== null;
+    });
   },
   async transcribe(audioPath: string) {
-    const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'refrain-asr-'));
-    for (const bin of ['whisper-cli', 'whisper']) {
-      try {
-        await run(bin, [audioPath, '--output_format', 'txt', '--output_dir', outDir], {
-          maxBuffer: 32 * 1024 * 1024,
-        });
-        const file = fs
-          .readdirSync(outDir)
-          .find((f) => f.endsWith('.txt'));
-        if (!file) return null;
-        return fs.readFileSync(path.join(outDir, file), 'utf8');
-      } catch {
-        continue;
-      } finally {
-        fs.rmSync(outDir, { recursive: true, force: true });
-      }
-    }
-    return null;
+    const cli = await resolveWhisper();
+    if (!cli) return null;
+    return withTempDir(async (dir) => {
+      const text = await runWhisper(cli, audioPath, dir);
+      return text?.trim() || null;
+    });
   },
 };
 
