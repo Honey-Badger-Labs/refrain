@@ -2,7 +2,11 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { whisperCliTranscriber, nullTranscriber } from '../src/checks/transcribe.js';
+import {
+  whisperCliTranscriber,
+  whisperApiTranscriber,
+  nullTranscriber,
+} from '../src/checks/transcribe.js';
 
 /**
  * These stand in for the two programs that answer to "whisper".
@@ -143,5 +147,98 @@ describe('the null transcriber', () => {
   it('is available and answers unknown, never a transcript', async () => {
     expect(await nullTranscriber.available()).toBe(true);
     expect(await nullTranscriber.transcribe('anything.wav')).toBeNull();
+  });
+});
+
+/**
+ * The same gap as the CLI one, on the other adapter and on the path a CI run
+ * takes: `refrain bakeoff` gates on `available()`, and two environment
+ * variables being set says nothing about whether the endpoint answers. A key
+ * expires, a host moves, an account runs out of credit — and each of those
+ * looked exactly like a working transcriber.
+ */
+describe('the whisper API transcriber', () => {
+  const realFetch = globalThis.fetch;
+  let calls = 0;
+
+  const withAsr = async (reply: () => Response | Promise<Response>, body: () => Promise<void>) => {
+    process.env.REFRAIN_ASR_URL = 'https://asr.example/v1/audio/transcriptions';
+    process.env.REFRAIN_ASR_KEY = 'k';
+    calls = 0;
+    globalThis.fetch = (async () => {
+      calls++;
+      return reply();
+    }) as typeof fetch;
+    try {
+      await body();
+    } finally {
+      globalThis.fetch = realFetch;
+      delete process.env.REFRAIN_ASR_URL;
+      delete process.env.REFRAIN_ASR_KEY;
+    }
+  };
+
+  it('is unavailable when nothing is configured', async () => {
+    delete process.env.REFRAIN_ASR_URL;
+    delete process.env.REFRAIN_ASR_KEY;
+    expect(await whisperApiTranscriber.available()).toBe(false);
+  });
+
+  it('asks the endpoint rather than trusting the variables', async () => {
+    await withAsr(
+      () => new Response('', { status: 200 }),
+      async () => {
+        expect(await whisperApiTranscriber.available()).toBe(true);
+        expect(calls).toBe(1);
+      },
+    );
+  });
+
+  it('is unavailable when the key is refused', async () => {
+    await withAsr(
+      () => new Response('nope', { status: 401 }),
+      async () => {
+        expect(await whisperApiTranscriber.available()).toBe(false);
+      },
+    );
+  });
+
+  it('is unavailable when the host cannot be reached', async () => {
+    await withAsr(
+      () => {
+        throw new Error('ENOTFOUND');
+      },
+      async () => {
+        expect(await whisperApiTranscriber.available()).toBe(false);
+      },
+    );
+  });
+
+  it('returns the transcript when there is one, and null when there is not', async () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'refrain-take-'));
+    const take = path.join(dir, 'take.wav');
+    fs.writeFileSync(take, 'audio');
+    try {
+      await withAsr(
+        () => new Response('  Tyger Tyger  ', { status: 200 }),
+        async () => {
+          expect(await whisperApiTranscriber.transcribe(take)).toBe('Tyger Tyger');
+        },
+      );
+      await withAsr(
+        () => new Response('   ', { status: 200 }),
+        async () => {
+          expect(await whisperApiTranscriber.transcribe(take)).toBeNull();
+        },
+      );
+      await withAsr(
+        () => new Response('nope', { status: 500 }),
+        async () => {
+          expect(await whisperApiTranscriber.transcribe(take)).toBeNull();
+        },
+      );
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

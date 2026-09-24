@@ -141,6 +141,22 @@ async function runWhisper(cli: WhisperCli, audioPath: string, outDir: string): P
   return file ? fs.readFileSync(path.join(outDir, file), 'utf8') : null;
 }
 
+/**
+ * A second of quiet tone, written where a transcriber can be pointed at it.
+ *
+ * There are no words in it and there do not need to be: what a probe tests is
+ * whether this transcriber can be driven at all, not whether it hears well.
+ */
+function writeProbe(dir: string): string {
+  const samples = new Float32Array(PROBE_SAMPLE_RATE);
+  for (let i = 0; i < samples.length; i++) {
+    samples[i] = 0.05 * Math.sin((2 * Math.PI * 220 * i) / PROBE_SAMPLE_RATE);
+  }
+  const file = path.join(dir, 'probe.wav');
+  fs.writeFileSync(file, encodeWav(samples, { sampleRate: PROBE_SAMPLE_RATE }));
+  return file;
+}
+
 async function withTempDir<T>(body: (dir: string) => Promise<T>): Promise<T> {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'refrain-asr-'));
   try {
@@ -155,15 +171,8 @@ export const whisperCliTranscriber: Transcriber = {
   async available() {
     const cli = await resolveWhisper();
     if (!cli) return false;
-    // A second of quiet tone. Whisper will find no words in it, and that is
-    // fine: what is being tested is whether this command line runs at all.
-    const samples = new Float32Array(PROBE_SAMPLE_RATE);
-    for (let i = 0; i < samples.length; i++) {
-      samples[i] = 0.05 * Math.sin((2 * Math.PI * 220 * i) / PROBE_SAMPLE_RATE);
-    }
     return withTempDir(async (dir) => {
-      const probe = path.join(dir, 'probe.wav');
-      fs.writeFileSync(probe, encodeWav(samples, { sampleRate: PROBE_SAMPLE_RATE }));
+      const probe = writeProbe(dir);
       return (await runWhisper(cli, probe, dir)) !== null;
     });
   },
@@ -187,31 +196,54 @@ export const whisperCliTranscriber: Transcriber = {
  */
 export const whisperApiTranscriber: Transcriber = {
   name: 'whisper-api',
+  /**
+   * Two variables being set is not the same as an endpoint that answers.
+   *
+   * A key can expire, a host can move and an account can run out of credit,
+   * and every one of those looks identical to a working transcriber if all
+   * that is checked is whether the strings are present. `refrain bakeoff`
+   * asks this before it starts paying a music model, so the question has to
+   * be "does it answer", not "is it configured".
+   */
   async available() {
-    return Boolean(process.env.REFRAIN_ASR_KEY && process.env.REFRAIN_ASR_URL);
+    if (!process.env.REFRAIN_ASR_KEY || !process.env.REFRAIN_ASR_URL) return false;
+    return withTempDir(async (dir) => {
+      const response = await askAsr(writeProbe(dir));
+      return response !== null && response.ok;
+    });
   },
   async transcribe(audioPath: string) {
-    const url = process.env.REFRAIN_ASR_URL;
-    const key = process.env.REFRAIN_ASR_KEY;
-    const model = process.env.REFRAIN_ASR_MODEL ?? 'whisper-1';
-    if (!url || !key) return null;
+    const response = await askAsr(audioPath);
+    if (!response || !response.ok) return null;
+    return (await response.text()).trim() || null;
+  },
+};
 
-    const form = new FormData();
-    form.append('file', new Blob([fs.readFileSync(audioPath)]), path.basename(audioPath));
-    form.append('model', model);
-    form.append('response_format', 'text');
-    // Sung words are not conversational speech; saying so measurably helps.
-    form.append('prompt', 'A sung performance of a poem. Transcribe the words exactly.');
+/** The request both of the above make. The caller decides what a reply means. */
+async function askAsr(audioPath: string): Promise<Response | null> {
+  const url = process.env.REFRAIN_ASR_URL;
+  const key = process.env.REFRAIN_ASR_KEY;
+  const model = process.env.REFRAIN_ASR_MODEL ?? 'whisper-1';
+  if (!url || !key) return null;
 
-    const response = await fetch(url, {
+  const form = new FormData();
+  form.append('file', new Blob([fs.readFileSync(audioPath)]), path.basename(audioPath));
+  form.append('model', model);
+  form.append('response_format', 'text');
+  // Sung words are not conversational speech; saying so measurably helps.
+  form.append('prompt', 'A sung performance of a poem. Transcribe the words exactly.');
+
+  try {
+    return await fetch(url, {
       method: 'POST',
       headers: { authorization: `Bearer ${key}` },
       body: form,
     });
-    if (!response.ok) return null;
-    return (await response.text()).trim() || null;
-  },
-};
+  } catch {
+    // Unreachable host, DNS failure, timeout — all of them mean "cannot score".
+    return null;
+  }
+}
 
 const transcribers = new Map<string, Transcriber>([
   [nullTranscriber.name, nullTranscriber],
