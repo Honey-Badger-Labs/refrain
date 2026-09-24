@@ -1,4 +1,5 @@
 export * from './schema.js';
+export * from './performance.js';
 export * from './ids.js';
 export * from './hash.js';
 export * from './routes.js';

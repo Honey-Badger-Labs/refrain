@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { lineAt, mapPosition, spanForLine } from '../src/player/alignment.js';
+import { lineAt, mapPosition, spanForLine, tokenAt, spanForToken, mapTokenPosition } from '../src/player/alignment.js';
 
 const alignment = [
   { lineIndex: 0, start: 1, end: 3 },
@@ -86,5 +86,45 @@ describe('mapPosition', () => {
 
   it('returns 0 rather than NaN when the source duration is unknown', () => {
     expect(mapPosition([], [], 5, 0, 20)).toBe(0);
+  });
+});
+
+/**
+ * The same searches, driven by a stream that is not text. This is the whole
+ * point of the token spelling: a ukulele chart and a synced lyric want
+ * identical "which one is sounding now" behaviour, and should not each get
+ * their own binary search to get subtly wrong.
+ */
+describe('a performance that is not words', () => {
+  const chart = [
+    { index: 0, start: 0, end: 2 },
+    { index: 1, start: 2, end: 4 },
+    { index: 2, start: 4, end: 6 },
+  ];
+
+  it('finds the shape being held at a moment', () => {
+    expect(tokenAt(chart, 0)).toBe(0);
+    expect(tokenAt(chart, 2)).toBe(1);
+    expect(tokenAt(chart, 5.9)).toBe(2);
+  });
+
+  it('answers -1 past the end, so nothing stays lit', () => {
+    expect(tokenAt(chart, 6)).toBe(-1);
+    expect(tokenAt([], 1)).toBe(-1);
+  });
+
+  it('seeks to a shape the learner taps', () => {
+    expect(spanForToken(chart, 1)).toEqual({ index: 1, start: 2, end: 4 });
+    expect(spanForToken(chart, 9)).toBeNull();
+  });
+
+  it('carries the position into a take at another tempo', () => {
+    const slower = [
+      { index: 0, start: 0, end: 4 },
+      { index: 1, start: 4, end: 8 },
+      { index: 2, start: 8, end: 12 },
+    ];
+    // Halfway through the second shape stays halfway through it.
+    expect(mapTokenPosition(chart, slower, 3, 6, 12)).toBe(6);
   });
 });
