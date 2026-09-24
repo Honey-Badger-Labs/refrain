@@ -301,3 +301,56 @@ describe('why a transcriber cannot run', () => {
     expect(await whisperCliTranscriber.why?.()).toBeNull();
   });
 });
+
+/**
+ * The bug that wasted a workflow run.
+ *
+ * `process.env.X ?? default` looks right and is wrong for environment
+ * variables: a CI runner sets an absent secret to the empty string, which is
+ * not nullish, so the default never applied and the endpoint was asked for a
+ * model named "". The 400 that came back was indistinguishable from a wrong
+ * model name.
+ */
+describe('an absent model name', () => {
+  const realFetch = globalThis.fetch;
+  let sent: string | null = null;
+
+  afterEach(() => {
+    globalThis.fetch = realFetch;
+    delete process.env.REFRAIN_ASR_URL;
+    delete process.env.REFRAIN_ASR_KEY;
+    delete process.env.REFRAIN_ASR_MODEL;
+  });
+
+  const capture = () => {
+    process.env.REFRAIN_ASR_URL = 'https://asr.example/v1/audio/transcriptions';
+    process.env.REFRAIN_ASR_KEY = 'k';
+    sent = null;
+    globalThis.fetch = (async (_url: unknown, init: { body: FormData }) => {
+      sent = String(init.body.get('model'));
+      return new Response('ok text', { status: 200 });
+    }) as unknown as typeof fetch;
+  };
+
+  it('falls back when the variable is empty, not only when it is unset', async () => {
+    capture();
+    process.env.REFRAIN_ASR_MODEL = '';
+    await whisperApiTranscriber.transcribe('/dev/null');
+    expect(sent).toBe('whisper-1');
+  });
+
+  it('still honours a model that is actually set', async () => {
+    capture();
+    process.env.REFRAIN_ASR_MODEL = 'whisper-large-v3';
+    await whisperApiTranscriber.transcribe('/dev/null');
+    expect(sent).toBe('whisper-large-v3');
+  });
+
+  it('repeats what the host said, which names the host', async () => {
+    process.env.REFRAIN_ASR_URL = 'https://asr.example/v1/audio/transcriptions';
+    process.env.REFRAIN_ASR_KEY = 'k';
+    globalThis.fetch = (async () =>
+      new Response('{"error":{"message":"model `` does not exist"}}', { status: 400 })) as typeof fetch;
+    expect(await whisperApiTranscriber.why?.()).toMatch(/does not exist/);
+  });
+});

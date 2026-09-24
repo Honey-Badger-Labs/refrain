@@ -253,16 +253,26 @@ export const whisperApiTranscriber: Transcriber = {
         return 'REFRAIN_ASR_URL and REFRAIN_ASR_KEY are set, but the host could not be reached';
       }
       if (response.ok) return null;
-      const model = process.env.REFRAIN_ASR_MODEL ?? 'whisper-1';
+      const model = process.env.REFRAIN_ASR_MODEL || 'whisper-1';
       // A wrong model name is the usual cause and the least obvious: the
       // default suits OpenAI and is rejected by every other host.
       const hint =
         response.status === 400 || response.status === 404
-          ? ` The model asked for was "${model}" — set REFRAIN_ASR_MODEL to one this host serves (Groq wants whisper-large-v3).`
+          ? ` The model asked for was "${model}" — set REFRAIN_ASR_MODEL to one this host serves (Groq wants whisper-large-v3)`
           : response.status === 401 || response.status === 403
-            ? ' The key was refused.'
+            ? ' The key was refused'
             : '';
-      return `the transcription endpoint answered ${response.status}.${hint}`;
+      // What the host said, which names the host and the actual complaint far
+      // better than a status code guessed at from here. Capped, and it is an
+      // error body: these carry a reason, never the credential that was sent.
+      let said = '';
+      try {
+        const body = (await response.text()).replace(/\s+/g, ' ').trim();
+        if (body) said = `. It said: ${body.slice(0, 300)}`;
+      } catch {
+        /* a body that cannot be read is not worth a second failure */
+      }
+      return `the transcription endpoint answered ${response.status}.${hint}${said}`;
     });
   },
 };
@@ -271,7 +281,10 @@ export const whisperApiTranscriber: Transcriber = {
 async function askAsr(audioPath: string): Promise<Response | null> {
   const url = process.env.REFRAIN_ASR_URL;
   const key = process.env.REFRAIN_ASR_KEY;
-  const model = process.env.REFRAIN_ASR_MODEL ?? 'whisper-1';
+  // `||`, not `??`: a CI runner sets an absent secret to the empty string
+  // rather than leaving it unset, and an empty model name draws a 400 that
+  // looks exactly like a wrong one. This cost a workflow run.
+  const model = process.env.REFRAIN_ASR_MODEL || 'whisper-1';
   if (!url || !key) return null;
 
   const form = new FormData();
