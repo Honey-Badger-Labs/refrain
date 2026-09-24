@@ -1,0 +1,162 @@
+# The bake-off — the one job in this repository that spends money.
+#
+# It exists because the ElevenLabs key lives in an environment secret and
+# GitHub secrets are write-only: nothing can read that value back out, not the
+# API, not `gh`, not the person who set it. A workflow is the only place the
+# value is available again, so the run happens where the key already is and
+# never has to be copied onto a laptop.
+#
+# Manual dispatch only, and it asks you to type a word before it bills anything.
+name: Bake-off
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "spend" to confirm this run will bill a paid API'
+        required: true
+        default: ''
+      budget:
+        description: 'Hard ceiling in US dollars. The run stops rather than passing it'
+        required: true
+        default: '5'
+      providers:
+        description: 'Comma-separated provider names. Empty means every configured one'
+        default: ''
+      chunks:
+        description: 'Comma-separated chunk ids. Empty means a spread chosen by the corpus'
+        default: ''
+      runs:
+        description: 'Renders per chunk per provider, for a look at variance'
+        default: '1'
+      dry_run:
+        description: 'Prove the configs and prompts without sending anything'
+        type: boolean
+        default: false
+      keep_audio:
+        description: 'Upload the renders too. THIS REPOSITORY IS PUBLIC — see the note in the workflow'
+        type: boolean
+        default: false
+      environment:
+        description: 'Which environment holds the API keys'
+        default: 'github-pages'
+
+permissions:
+  contents: read
+
+# Two bake-offs at once would race the budget ceiling, and each is billable.
+concurrency:
+  group: bakeoff
+  cancel-in-progress: false
+
+jobs:
+  bakeoff:
+    runs-on: ubuntu-latest
+
+    # Where ELEVENLABS_API_KEY lives. Referencing an environment is how a job
+    # is handed its secrets, and it also records a deployment against it — so
+    # an extra entry will appear under the github-pages environment that did
+    # not deploy the site. Harmless, but if it bothers you, make a `bakeoff`
+    # environment, put the key there, and pass its name above.
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Refuse a run that was not confirmed
+        if: inputs.confirm != 'spend' && inputs.dry_run != true
+        run: |
+          echo "::error::This run would bill a paid API. Type 'spend' in the confirm box, or tick dry_run."
+          exit 1
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install ffmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          ffmpeg -hide_banner -encoders | grep -E 'libopus|aac'
+
+      - run: npm ci
+
+      - name: Build the pipeline
+        run: |
+          npm run build --workspace @refrain/catalogue
+          npm run build --workspace @refrain/pipeline
+
+      # Word accuracy is the number this run exists to produce, so prove the
+      # scorer works before anything is billed. `bakeoff` refuses without one,
+      # but failing here costs nothing and says so more clearly.
+      - name: Check a transcriber is configured
+        env:
+          REFRAIN_ASR_URL: ${{ secrets.REFRAIN_ASR_URL }}
+          REFRAIN_ASR_KEY: ${{ secrets.REFRAIN_ASR_KEY }}
+        run: |
+          if [ -z "$REFRAIN_ASR_URL" ] || [ -z "$REFRAIN_ASR_KEY" ]; then
+            echo "::error::No transcriber. Set REFRAIN_ASR_URL and REFRAIN_ASR_KEY in the ${{ inputs.environment }} environment, or the run would cost money and score nothing."
+            exit 1
+          fi
+
+      # Inputs arrive through the environment, never interpolated into the
+      # script: `${{ }}` is pasted in as text before bash sees the line, so an
+      # input containing a shell metacharacter would run as code.
+      - name: Bake-off
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          REFRAIN_ASR_URL: ${{ secrets.REFRAIN_ASR_URL }}
+          REFRAIN_ASR_KEY: ${{ secrets.REFRAIN_ASR_KEY }}
+          REFRAIN_ASR_MODEL: ${{ secrets.REFRAIN_ASR_MODEL }}
+          IN_BUDGET: ${{ inputs.budget }}
+          IN_RUNS: ${{ inputs.runs }}
+          IN_PROVIDERS: ${{ inputs.providers }}
+          IN_CHUNKS: ${{ inputs.chunks }}
+          IN_DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          args=(--budget "$IN_BUDGET" --runs "$IN_RUNS")
+          if [ -n "$IN_PROVIDERS" ]; then args+=(--providers "$IN_PROVIDERS"); fi
+          if [ -n "$IN_CHUNKS" ]; then args+=(--chunks "$IN_CHUNKS"); fi
+          if [ "$IN_DRY_RUN" = "true" ]; then args+=(--dry-run); fi
+          echo "refrain bakeoff ${args[*]}"
+          npm run pipeline -- bakeoff "${args[@]}" | tee bakeoff-output.txt
+
+      - name: Put the report in the run summary
+        if: always()
+        run: |
+          report=$(ls -d work/bakeoff/*/ 2>/dev/null | tail -1)
+          if [ -n "$report" ] && [ -f "$report/report.md" ]; then
+            cat "$report/report.md" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo '## Bake-off' >> "$GITHUB_STEP_SUMMARY"
+            echo 'No report was written. The output:' >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat bakeoff-output.txt >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # The numbers only. On a public repository anyone can download a run's
+      # artifacts, and the renders are audio someone paid for under terms that
+      # have not been confirmed — `.gitignore` says they are kept locally and
+      # never published, and an artifact is publishing.
+      - name: Keep the report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bakeoff-report
+          path: |
+            work/bakeoff/*/report.md
+            work/bakeoff/*/report.json
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Keep the audio as well
+        if: always() && inputs.keep_audio
+        uses: actions/upload-artifact@v4
+        with:
+          name: bakeoff-audio
+          path: work/bakeoff/*/*.wav
+          if-no-files-found: warn
+          retention-days: 7
