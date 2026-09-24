@@ -7,7 +7,13 @@ import { prepareLyrics } from '../text/lyricprep.js';
 import { getAdapter } from '../render/types.js';
 import { loadProviders, registerProviders } from '../render/providers.js';
 import { runChecks, type CheckReport } from '../checks/autochecks.js';
-import { bestAvailableTranscriber, getTranscriber, type Transcriber } from '../checks/transcribe.js';
+import {
+  bestAvailableTranscriber,
+  getTranscriber,
+  whisperApiTranscriber,
+  whisperCliTranscriber,
+  type Transcriber,
+} from '../checks/transcribe.js';
 
 /**
  * The bake-off.
@@ -142,8 +148,17 @@ export async function bakeoff(options: BakeoffOptions = {}): Promise<string> {
     // run, so this refuses instead. --allow-unscored is there for the case
     // where the audio itself is the point.
     if (!options.allowUnscored) {
+      // Say which of the two it is. "Nothing is configured" and "something is
+      // configured and does not work" need opposite responses, and telling
+      // someone to set variables they have already set sends them the wrong way.
+      const reasons = (
+        await Promise.all([whisperCliTranscriber, whisperApiTranscriber].map((t) => t.why?.() ?? null))
+      ).filter((r): r is string => Boolean(r));
+      const detail = reasons.length
+        ? ` What was found: ${reasons.join('; ')}.`
+        : ' Install whisper (whisper-cli or whisper on PATH), or set REFRAIN_ASR_URL and REFRAIN_ASR_KEY.';
       throw new Error(
-        'no transcriber is available, so word accuracy — the number this bake-off exists to produce — cannot be measured, and the renders would cost money without answering anything. Install whisper (whisper-cli or whisper on PATH), or set REFRAIN_ASR_URL and REFRAIN_ASR_KEY. Pass --allow-unscored to render anyway.',
+        `no transcriber is available, so word accuracy — the number this bake-off exists to produce — cannot be measured, and the renders would cost money without answering anything.${detail} Pass --allow-unscored to render anyway.`,
       );
     }
     progress(

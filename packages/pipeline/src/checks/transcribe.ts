@@ -21,6 +21,15 @@ export interface Transcriber {
   available(): Promise<boolean>;
   /** Returns the transcript, or null when this adapter cannot judge the audio. */
   transcribe(audioPath: string): Promise<string | null>;
+  /**
+   * Why this adapter cannot run, when it is worth saying.
+   *
+   * "Unavailable" covers two very different situations: nothing is configured,
+   * and something is configured but does not work. The first is answered by
+   * the generic advice; the second is answered by nothing at all unless the
+   * adapter says what it found. Returns null when the generic advice fits.
+   */
+  why?(): Promise<string | null>;
 }
 
 /**
@@ -184,6 +193,25 @@ export const whisperCliTranscriber: Transcriber = {
       return text?.trim() || null;
     });
   },
+  async why() {
+    const found: string[] = [];
+    for (const bin of WHISPER_BINARIES) {
+      const help = await helpText(bin);
+      if (!help) continue;
+      const dialect = dialectOf(help);
+      if (!dialect) {
+        found.push(`${bin} is on the PATH but its command line is not one this knows`);
+      } else if (dialect === 'cpp' && !cppModel()) {
+        found.push(
+          `${bin} is whisper.cpp and ships no weights. Download a ggml model and point WHISPER_MODEL at it, or put it in ~/.cache/whisper`,
+        );
+      }
+    }
+    if (found.length) return found.join('; ');
+    const cli = await resolveWhisper();
+    if (cli) return `${cli.bin} is installed but produced nothing for a probe clip`;
+    return null;
+  },
 };
 
 /**
@@ -216,6 +244,26 @@ export const whisperApiTranscriber: Transcriber = {
     const response = await askAsr(audioPath);
     if (!response || !response.ok) return null;
     return (await response.text()).trim() || null;
+  },
+  async why() {
+    if (!process.env.REFRAIN_ASR_KEY || !process.env.REFRAIN_ASR_URL) return null;
+    return withTempDir(async (dir) => {
+      const response = await askAsr(writeProbe(dir));
+      if (!response) {
+        return 'REFRAIN_ASR_URL and REFRAIN_ASR_KEY are set, but the host could not be reached';
+      }
+      if (response.ok) return null;
+      const model = process.env.REFRAIN_ASR_MODEL ?? 'whisper-1';
+      // A wrong model name is the usual cause and the least obvious: the
+      // default suits OpenAI and is rejected by every other host.
+      const hint =
+        response.status === 400 || response.status === 404
+          ? ` The model asked for was "${model}" — set REFRAIN_ASR_MODEL to one this host serves (Groq wants whisper-large-v3).`
+          : response.status === 401 || response.status === 403
+            ? ' The key was refused.'
+            : '';
+      return `the transcription endpoint answered ${response.status}.${hint}`;
+    });
   },
 };
 

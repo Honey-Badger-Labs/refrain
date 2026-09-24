@@ -242,3 +242,62 @@ describe('the whisper API transcriber', () => {
     }
   });
 });
+
+/**
+ * The message a failed bake-off leaves behind.
+ *
+ * The first real run of the workflow refused with "set REFRAIN_ASR_URL and
+ * REFRAIN_ASR_KEY" while both were set, which points the reader at the one
+ * thing that was already done. Configured-and-broken is a different problem
+ * from not-configured and needs a different sentence.
+ */
+describe('why a transcriber cannot run', () => {
+  const realFetch = globalThis.fetch;
+
+  afterEach(() => {
+    globalThis.fetch = realFetch;
+    delete process.env.REFRAIN_ASR_URL;
+    delete process.env.REFRAIN_ASR_KEY;
+    delete process.env.REFRAIN_ASR_MODEL;
+  });
+
+  const asr = (status: number) => {
+    process.env.REFRAIN_ASR_URL = 'https://asr.example/v1/audio/transcriptions';
+    process.env.REFRAIN_ASR_KEY = 'k';
+    globalThis.fetch = (async () => new Response('', { status })) as typeof fetch;
+  };
+
+  it('says nothing when nothing is configured, so the generic advice stands', async () => {
+    expect(await whisperApiTranscriber.why?.()).toBeNull();
+  });
+
+  it('names the status when the endpoint answers badly', async () => {
+    asr(500);
+    expect(await whisperApiTranscriber.why?.()).toMatch(/answered 500/);
+  });
+
+  it('points at the model name on a 400, which is the usual cause', async () => {
+    asr(400);
+    const why = (await whisperApiTranscriber.why?.()) ?? '';
+    expect(why).toMatch(/REFRAIN_ASR_MODEL/);
+    expect(why).toMatch(/whisper-1/);
+  });
+
+  it('says the key was refused on a 401', async () => {
+    asr(401);
+    expect(await whisperApiTranscriber.why?.()).toMatch(/key was refused/);
+  });
+
+  it('says so when the host cannot be reached at all', async () => {
+    process.env.REFRAIN_ASR_URL = 'https://asr.example/v1/audio/transcriptions';
+    process.env.REFRAIN_ASR_KEY = 'k';
+    globalThis.fetch = (async () => {
+      throw new Error('ENOTFOUND');
+    }) as typeof fetch;
+    expect(await whisperApiTranscriber.why?.()).toMatch(/could not be reached/);
+  });
+
+  it('stays quiet when no whisper is installed at all', async () => {
+    expect(await whisperCliTranscriber.why?.()).toBeNull();
+  });
+});
