@@ -7,7 +7,12 @@ import { prepareLyrics } from '../text/lyricprep.js';
 import { getAdapter } from '../render/types.js';
 import { loadProviders, registerProviders } from '../render/providers.js';
 import { runChecks, type CheckReport } from '../checks/autochecks.js';
-import { bestAvailableTranscriber, getTranscriber, type Transcriber } from '../checks/transcribe.js';
+import {
+  bestAvailableTranscriber,
+  getTranscriber,
+  whisperUnavailableReason,
+  type Transcriber,
+} from '../checks/transcribe.js';
 
 /**
  * The bake-off.
@@ -142,8 +147,11 @@ export async function bakeoff(options: BakeoffOptions = {}): Promise<string> {
     // run, so this refuses instead. --allow-unscored is there for the case
     // where the audio itself is the point.
     if (!options.allowUnscored) {
+      // "Install whisper" is unhelpful to someone who just did; say which
+      // whisper answered and what it still needs.
+      const diagnosis = await whisperUnavailableReason();
       throw new Error(
-        'no transcriber is available, so word accuracy — the number this bake-off exists to produce — cannot be measured, and the renders would cost money without answering anything. Install whisper (whisper-cli or whisper on PATH), or set REFRAIN_ASR_URL and REFRAIN_ASR_KEY. Pass --allow-unscored to render anyway.',
+        `no transcriber is available, so word accuracy — the number this bake-off exists to produce — cannot be measured, and the renders would cost money without answering anything. Install whisper (whisper-cli or whisper on PATH), or set REFRAIN_ASR_URL and REFRAIN_ASR_KEY. Pass --allow-unscored to render anyway.${diagnosis ? `\n\n${diagnosis}` : ''}`,
       );
     }
     progress(

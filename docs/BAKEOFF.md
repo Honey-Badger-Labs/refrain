@@ -60,6 +60,13 @@ Without an ASR endpoint (or a local `whisper-cli`), the run produces audio and *
 number** — which is the one thing it exists to produce. The command says so rather than quietly
 skipping it.
 
+Two unrelated programs answer to the name whisper, and only one of them works out of the box.
+`pip install -U openai-whisper` needs no further setup. `brew install whisper-cpp` gives you
+whisper.cpp, which ships no model — set `REFRAIN_WHISPER_MODEL` to a ggml model file or the run
+refuses before it spends. It refuses rather than warns because whisper.cpp exits 0 on an unknown
+argument, so a version of this that trusted the exit code would have paid for three renders and
+then reported accuracy as "not measured".
+
 ## Run it
 
 ```bash

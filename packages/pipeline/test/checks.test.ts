@@ -1,7 +1,16 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { runChecks, DEFAULT_THRESHOLDS } from '../src/checks/autochecks.js';
 import { encodeWav, peak, rms } from '../src/audio/wav.js';
-import { nullTranscriber } from '../src/checks/transcribe.js';
+import {
+  nullTranscriber,
+  whisperCliTranscriber,
+  whisperFlavour,
+  whisperOutput,
+  whisperUnavailableReason,
+} from '../src/checks/transcribe.js';
 
 const SAMPLE_RATE = 8000;
 
@@ -164,5 +173,120 @@ describe('the default transcriber', () => {
   it('is available and honestly returns nothing', async () => {
     await expect(nullTranscriber.available()).resolves.toBe(true);
     await expect(nullTranscriber.transcribe('anything.wav')).resolves.toBeNull();
+  });
+});
+
+// Real --help output, trimmed to the lines that distinguish the two.
+const OPENAI_HELP = `usage: whisper [-h] [--model MODEL] [--output_dir OUTPUT_DIR]
+                [--output_format {txt,vtt,srt,tsv,json,all}]
+  --output_dir OUTPUT_DIR, -o OUTPUT_DIR   directory to save the outputs`;
+
+const WHISPER_CPP_HELP = `usage: whisper-cli [options] file0 file1 ...
+  -otxt,     --output-txt           [false  ] output result in a text file
+  -of FNAME, --output-file FNAME    [       ] output file path (without file extension)
+  -m FNAME,  --model FNAME          [models/ggml-base.en.bin] model path`;
+
+/**
+ * The bug: whisper.cpp exits 0 on `--help` AND on an unknown argument, so a
+ * probe that only asked "did --help succeed?" accepted it, then drove it with
+ * openai-whisper's flags. It printed a usage dump, exited 0, wrote no file,
+ * and the bake-off reported accuracy as "not measured" — after paying for the
+ * renders it could no longer score.
+ */
+describe('telling the two whispers apart', () => {
+  const originalPath = process.env.PATH;
+  const originalModel = process.env.REFRAIN_WHISPER_MODEL;
+  const made: string[] = [];
+
+  afterEach(() => {
+    process.env.PATH = originalPath;
+    if (originalModel === undefined) delete process.env.REFRAIN_WHISPER_MODEL;
+    else process.env.REFRAIN_WHISPER_MODEL = originalModel;
+    for (const dir of made.splice(0)) fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  /** A stand-in for whisper.cpp: usage to stderr, exit 0, whatever the args. */
+  function fakeWhisperCppOnPath(): void {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'refrain-fake-whisper-'));
+    made.push(dir);
+    const bin = path.join(dir, 'whisper-cli');
+    fs.writeFileSync(bin, `#!/bin/sh\ncat >&2 <<'EOF'\n${WHISPER_CPP_HELP}\nEOF\nexit 0\n`);
+    fs.chmodSync(bin, 0o755);
+    process.env.PATH = `${dir}${path.delimiter}${process.env.PATH ?? ''}`;
+  }
+
+  it('reads each flavour off its own help text', () => {
+    expect(whisperFlavour(OPENAI_HELP)).toBe('openai-whisper');
+    expect(whisperFlavour(WHISPER_CPP_HELP)).toBe('whisper-cpp');
+    expect(whisperFlavour('some other program entirely')).toBeNull();
+  });
+
+  it('never sends openai-whisper flags to whisper.cpp', () => {
+    const cpp = whisperOutput('whisper-cpp', '/tmp/a.wav', '/tmp/out');
+    expect(cpp.args).toContain('-otxt');
+    expect(cpp.args.join(' ')).not.toContain('--output_format');
+    expect(cpp.args.join(' ')).not.toContain('--output_dir');
+    expect(cpp.transcript).toBe(path.join('/tmp/out', 'transcript.txt'));
+
+    const openai = whisperOutput('openai-whisper', '/tmp/a.wav', '/tmp/out');
+    expect(openai.args).toContain('--output_format');
+    expect(openai.transcript).toBe(path.join('/tmp/out', 'a.txt'));
+  });
+
+  it('refuses a whisper.cpp with no model instead of reporting itself ready', async () => {
+    fakeWhisperCppOnPath();
+    delete process.env.REFRAIN_WHISPER_MODEL;
+
+    await expect(whisperCliTranscriber.available()).resolves.toBe(false);
+    await expect(whisperUnavailableReason()).resolves.toMatch(/REFRAIN_WHISPER_MODEL/);
+  });
+
+  it('refuses a model path that is not there', async () => {
+    fakeWhisperCppOnPath();
+    process.env.REFRAIN_WHISPER_MODEL = path.join(os.tmpdir(), 'no-such-ggml-model.bin');
+
+    await expect(whisperCliTranscriber.available()).resolves.toBe(false);
+    await expect(whisperUnavailableReason()).resolves.toMatch(/does not exist/);
+  });
+
+  it('reads the transcript an openai-whisper writes', async () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'refrain-fake-whisper-'));
+    made.push(dir);
+    const bin = path.join(dir, 'whisper');
+    // Answers --help like openai-whisper, and otherwise writes <stem>.txt into
+    // the directory --output_dir names, which is the contract being relied on.
+    fs.writeFileSync(
+      bin,
+      `#!/bin/sh
+if [ "$1" = "--help" ]; then cat <<'EOF'
+${OPENAI_HELP}
+EOF
+exit 0; fi
+stem=$(basename "$1"); stem=\${stem%.*}
+printf 'tyger tyger burning bright' > "$5/$stem.txt"
+`,
+    );
+    fs.chmodSync(bin, 0o755);
+    process.env.PATH = `${dir}${path.delimiter}${process.env.PATH ?? ''}`;
+
+    await expect(whisperCliTranscriber.available()).resolves.toBe(true);
+    await expect(whisperCliTranscriber.transcribe('/tmp/the-tyger.wav')).resolves.toBe(
+      'tyger tyger burning bright',
+    );
+  });
+
+  it('returns null rather than a transcript when the binary writes no file', async () => {
+    fakeWhisperCppOnPath();
+    const model = path.join(os.tmpdir(), `refrain-fake-model-${Date.now()}.bin`);
+    fs.writeFileSync(model, 'not really a model');
+    process.env.REFRAIN_WHISPER_MODEL = model;
+    try {
+      // available() is satisfied, but the binary still writes nothing. The
+      // exit code says success; only the missing file tells the truth.
+      await expect(whisperCliTranscriber.available()).resolves.toBe(true);
+      await expect(whisperCliTranscriber.transcribe('/tmp/nope.wav')).resolves.toBeNull();
+    } finally {
+      fs.rmSync(model, { force: true });
+    }
   });
 });
