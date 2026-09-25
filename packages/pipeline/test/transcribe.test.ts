@@ -273,7 +273,9 @@ describe('why a transcriber cannot run', () => {
 
   it('names the status when the endpoint answers badly', async () => {
     asr(500);
-    expect(await whisperApiTranscriber.why?.()).toMatch(/answered 500/);
+    const why = (await whisperApiTranscriber.why?.()) ?? '';
+    expect(why).toMatch(/answered 500/);
+    expect(why).not.toMatch(/\.\./);
   });
 
   it('points at the model name on a 400, which is the usual cause', async () => {

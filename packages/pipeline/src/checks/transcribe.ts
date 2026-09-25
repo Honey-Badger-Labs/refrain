@@ -268,11 +268,13 @@ export const whisperApiTranscriber: Transcriber = {
       let said = '';
       try {
         const body = (await response.text()).replace(/\s+/g, ' ').trim();
-        if (body) said = `. It said: ${body.slice(0, 300)}`;
+        if (body) said = `. It said: ${body.slice(0, 300).replace(/\.$/, '')}`;
       } catch {
         /* a body that cannot be read is not worth a second failure */
       }
-      return `the transcription endpoint answered ${response.status}.${hint}${said}`;
+      // No hint and a body would read "answered 429.. It said", so the full
+      // stop belongs to whichever clause actually ends the sentence.
+      return `the transcription endpoint answered ${response.status}${hint}${said}.`;
     });
   },
 };
