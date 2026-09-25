@@ -35,6 +35,7 @@ export async function decodeToSamples(
     temporary = true;
   }
 
+  let decoded = false;
   try {
     const { stdout } = await run(
       'ffmpeg',
@@ -61,8 +62,15 @@ export async function decodeToSamples(
     // Copy rather than view: the Buffer may not be 4-byte aligned.
     const samples = new Float32Array(buffer.length / 4);
     for (let i = 0; i < samples.length; i++) samples[i] = buffer.readFloatLE(i * 4);
+    decoded = true;
     return { samples, sampleRate };
+  } catch (error) {
+    // Somebody paid for these bytes. Whatever went wrong here — a missing
+    // ffmpeg, a corrupt file, an error page in place of audio — throwing them
+    // away as well turns a recoverable problem into a second charge.
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`${message}. The bytes that came back are kept at ${file}`);
   } finally {
-    if (temporary && fs.existsSync(file)) fs.unlinkSync(file);
+    if (temporary && decoded && fs.existsSync(file)) fs.unlinkSync(file);
   }
 }

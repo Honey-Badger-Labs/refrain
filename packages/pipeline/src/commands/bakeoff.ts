@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { encodeWav, peak } from '../audio/wav.js';
+import { assertFfmpeg } from '../audio/encode.js';
 import { ensureDir, resolvePaths } from '../paths.js';
 import { JsonStore } from '../store.js';
 import { prepareLyrics } from '../text/lyricprep.js';
@@ -115,7 +116,21 @@ export async function bakeoff(options: BakeoffOptions = {}): Promise<string> {
   }
 
   if (options.dryRun) {
-    const style = options.styleId ?? records.presets[0]?.styleId ?? 'hymn';
+    // Every render comes back as MP3 and has to be decoded before a single check
+  // can read it, so a missing ffmpeg makes the whole run worthless — and the
+  // last one proved it, paying for three renders and discarding all three.
+  // Same rule as the transcriber: refuse before spending, not after.
+  if (!options.dryRun) {
+    try {
+      await assertFfmpeg([]);
+    } catch (error) {
+      throw new Error(
+        `${error instanceof Error ? error.message : String(error)} Every render has to be decoded before it can be checked, so this run would cost money and produce nothing readable.`,
+      );
+    }
+  }
+
+  const style = options.styleId ?? records.presets[0]?.styleId ?? 'hymn';
     const voice = options.voiceId ?? records.presets[0]?.voiceId ?? 'alto';
     const lines = [
       '',
