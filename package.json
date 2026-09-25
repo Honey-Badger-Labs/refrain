@@ -20,10 +20,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
-    "pipeline": "node --enable-source-maps packages/pipeline/dist/cli.js",
+    "pipeline": "node --env-file-if-exists=.env --enable-source-maps packages/pipeline/dist/cli.js",
     "studio": "npm run dev --workspace @refrain/studio",
     "dev": "npm run dev --workspace @refrain/listener",
-    "pilot": "npm run build --workspace @refrain/catalogue && npm run build --workspace @refrain/pipeline && node packages/pipeline/dist/cli.js pilot",
+    "pilot": "npm run build --workspace @refrain/catalogue && npm run build --workspace @refrain/pipeline && node --env-file-if-exists=.env packages/pipeline/dist/cli.js pilot",
     "smoke": "node scripts/smoke.mjs"
   },
   "devDependencies": {

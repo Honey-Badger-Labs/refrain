@@ -243,11 +243,15 @@ export async function bakeoff(options: BakeoffOptions = {}): Promise<string> {
             }`,
           );
         } catch (error) {
-          // A failed render usually still costs money, so it counts against
-          // the budget unless the provider clearly refused before generating.
+          // A refused request generated nothing and is not billed; a failure
+          // after generation is. Any 4xx is the provider declining the call —
+          // an enumerated list of codes missed the 400 that ElevenLabs returns
+          // for a bad key, and charged the run for three calls it never made.
+          // 5xx stays chargeable: the audio may well have been produced.
           const message = error instanceof Error ? error.message : String(error);
-          const refused = /\b(401|403|404|422)\b/.test(message);
-          if (!refused) spent += provider.config.costPerRenderUsd;
+          const refused = /returned 4\d{2}\b/.test(message);
+          if (refused) attempt.costUsd = 0;
+          else spent += provider.config.costPerRenderUsd;
           attempt.error = message;
           progress(`FAIL ${label} — ${message.slice(0, 200)}`);
         }
@@ -289,7 +293,9 @@ export function summarise(attempts: Attempt[]): Summary[] {
       .map((a) => a.renderSeconds)
       .filter((s): s is number => typeof s === 'number');
     const usable = ok.filter((a) => a.report?.passed).length;
-    const cost = list.reduce((sum, a) => sum + (a.ok || !a.error ? a.costUsd : 0), 0);
+    // The attempt carries what it cost — zero when the provider refused it —
+    // so this and the "spent" headline are the same arithmetic.
+    const cost = list.reduce((sum, a) => sum + a.costUsd, 0);
 
     return {
       provider,

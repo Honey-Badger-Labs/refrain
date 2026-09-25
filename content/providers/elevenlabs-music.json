@@ -1,6 +1,6 @@
 {
   "name": "elevenlabs-music",
-  "description": "ElevenLabs Music. Answers with the audio bytes directly and accepts a seed, which keeps a render reproducible.",
+  "description": "ElevenLabs Music. Answers with the audio bytes directly. A prompt-led request cannot carry a seed \u2014 the API refuses the pair with a 422 \u2014 so renders from this provider are not reproducible and invariant 6 does not hold for it.",
   "apiKeyEnv": "ELEVENLABS_API_KEY",
   "costPerRenderUsd": 0.1,
   "modelId": "music_v1",
@@ -20,7 +20,6 @@
       "prompt": "{{prompt}}",
       "music_length_ms": "{{durationMs}}",
       "model_id": "music_v1",
-      "seed": "{{seed}}",
       "output_format": "mp3_44100_128"
     }
   },
