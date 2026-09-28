@@ -88,6 +88,58 @@ a number.
 | <90%, or >$1 per usable | Sung mode does not work yet | **Pivot to drama mode, do not defer it.** Multi-voice TTS is far more accurate and far faster to review. Phase 2 becomes Phase 1. |
 | No provider has clean commercial terms | Rights-blocked | Stop. That is not a build problem. |
 
+## What the first run found
+
+Run on 25 September 2026: ElevenLabs Music (`music_v1`), three Blake poems, one take each, $0.30.
+
+| | |
+| --- | --- |
+| Word accuracy, as sung | **96.9%** mean — 97.1% / 97.9% / 95.8% |
+| Words genuinely wrong | **9 of 272**, none dropped, none added |
+| Cost per render | $0.10 |
+| Render time | 13s mean, for 25–104s of audio |
+| First-pass approval | 0% — see below |
+
+**This lands in the "Close" band, not the pivot band.** One more cycle on the prompt, for this
+provider, capped at three hours.
+
+### The number the run first reported was 85.4%, and it was wrong
+
+That figure, and the verdict it generated — *"not usable for a text-faithful library"* — came from
+two faults in the instrument rather than anything the model did.
+
+| | |
+| --- | --- |
+| `ggml-base.en` as the transcriber | The smallest whisper, installed to prove the plumbing worked. `medium.en` on the same audio: **94.0%**. |
+| Blake's orthography scored as error | `charter'd` against `chartered`, `tyger` against `tiger`. Judged on what was sung: **96.9%**. |
+
+Every "dropped" and "added" word in the first report was the transcriber's. The model dropped
+nothing across 272 words.
+
+Both faults are now fixed, and both were the same mistake in different clothes: **a measurement
+believed without its instrument being checked.** That is what R-8 exists to prevent, and it caught
+the optimistic case — a check reporting `pass` when it could not run — while this was the
+pessimistic one, which is harder to notice because a bad number looks like bad news rather than a
+bug.
+
+### What is still unknown
+
+The nine remaining mismatches — `worm→one`, `forged→fought`, `hearse→hers`, `dare→eer`,
+`seize→sees`, `art→heart`, `work→word`, `forests→forest` — may be the model or may still be the
+transcriber. They are all plausible mishearings of sung vowels. **Only listening settles it**, and
+that is the one thing the numbers were never going to do.
+
+The 0% first-pass approval is not a verdict on the model either. Every render failed the accuracy
+check against a 99% threshold, and every render also failed a clipping check that was reporting
+damage this pipeline caused by writing 16-bit without headroom. Both are fixed; neither has been
+re-measured on a fresh render.
+
+### What it cost to learn
+
+$0.60 in total, of which $0.30 bought three renders that were discarded because ffmpeg was missing
+and the bytes were deleted on the way out of the failure. Both of those are fixed too: the bake-off
+refuses to start without ffmpeg, and a decode that fails keeps what it could not read.
+
 ## What this does not measure
 
 **Alignment.** A music API returns audio, not line timings, so the adapter returns none and the
