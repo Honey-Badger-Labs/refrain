@@ -107,13 +107,58 @@ export type Preset = z.infer<typeof PresetSchema>;
 export const TrackStatusSchema = z.enum(['candidate', 'approved', 'published', 'rejected']);
 export type TrackStatus = z.infer<typeof TrackStatusSchema>;
 
-/** One line of text with the moment it starts and ends in the audio. */
+/**
+ * What a performance's tokens are.
+ *
+ * A track's alignment answers one question — which token is sounding at time
+ * t — and nothing about that question is specific to text. A tongue-drum
+ * arrangement indexes pads; a ukulele chart indexes chord shapes; both want
+ * the same search the synced text view already does. The kind names what an
+ * index points into, so a consumer knows what it has been handed before it
+ * tries to draw it.
+ */
+export const TokenKindSchema = z.enum(['line', 'note', 'chord']);
+export type TokenKind = z.infer<typeof TokenKindSchema>;
+
+/** Token number `index` sounds from `start` to `end`, in seconds. */
+export const TokenSpanSchema = z.object({
+  index: z.number().int().min(0),
+  start: z.number().min(0),
+  end: z.number().min(0),
+});
+export type TokenSpan = z.infer<typeof TokenSpanSchema>;
+
+/**
+ * One line of text with the moment it starts and ends in the audio.
+ *
+ * This is the `line` kind of `TokenSpan`, and it keeps its own spelling on
+ * purpose. `lineIndex` is what every published `catalogue.json` already says,
+ * the catalogue carries a content hash, and the app refuses a mismatch — so
+ * renaming the field to `index` would invalidate every library in the world
+ * that this code can currently play, to buy a tidier name. `asTokenSpans`
+ * bridges the two, once per track rather than once per timeupdate.
+ */
 export const AlignmentSpanSchema = z.object({
   lineIndex: z.number().int().min(0),
   start: z.number().min(0),
   end: z.number().min(0),
 });
 export type AlignmentSpan = z.infer<typeof AlignmentSpanSchema>;
+
+/**
+ * A stream of tokens with their timings — what a listener follows, or a
+ * learner plays along to.
+ *
+ * `tokens` is what to show for each index: a line of text, a pad number, a
+ * chord name. The audio it belongs to is the track's, so a performance is only
+ * ever meaningful next to one.
+ */
+export const PerformanceSchema = z.object({
+  kind: TokenKindSchema,
+  tokens: z.array(z.string().max(200)).max(5000),
+  spans: z.array(TokenSpanSchema),
+});
+export type Performance = z.infer<typeof PerformanceSchema>;
 
 /**
  * One encoding of a track.
@@ -145,6 +190,12 @@ export const TrackSchema = z.object({
   sources: z.array(AudioSourceSchema).min(1),
   durationSeconds: z.number().positive().max(60 * 60),
   alignment: z.array(AlignmentSpanSchema),
+  /**
+   * Token streams other than the words. Optional, and omitted rather than
+   * written empty: a track with nothing extra must serialise exactly as it did
+   * before this field existed, or every published catalogue's hash moves.
+   */
+  performances: z.array(PerformanceSchema).max(8).optional(),
 });
 export type Track = z.infer<typeof TrackSchema>;
 

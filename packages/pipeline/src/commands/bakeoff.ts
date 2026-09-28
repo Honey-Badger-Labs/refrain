@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { encodeWav, peak } from '../audio/wav.js';
+import { assertFfmpeg } from '../audio/encode.js';
 import { ensureDir, resolvePaths } from '../paths.js';
 import { JsonStore } from '../store.js';
 import { prepareLyrics } from '../text/lyricprep.js';
@@ -10,7 +11,8 @@ import { runChecks, type CheckReport } from '../checks/autochecks.js';
 import {
   bestAvailableTranscriber,
   getTranscriber,
-  whisperUnavailableReason,
+  whisperApiTranscriber,
+  whisperCliTranscriber,
   type Transcriber,
 } from '../checks/transcribe.js';
 
@@ -114,7 +116,21 @@ export async function bakeoff(options: BakeoffOptions = {}): Promise<string> {
   }
 
   if (options.dryRun) {
-    const style = options.styleId ?? records.presets[0]?.styleId ?? 'hymn';
+    // Every render comes back as MP3 and has to be decoded before a single check
+  // can read it, so a missing ffmpeg makes the whole run worthless — and the
+  // last one proved it, paying for three renders and discarding all three.
+  // Same rule as the transcriber: refuse before spending, not after.
+  if (!options.dryRun) {
+    try {
+      await assertFfmpeg([]);
+    } catch (error) {
+      throw new Error(
+        `${error instanceof Error ? error.message : String(error)} Every render has to be decoded before it can be checked, so this run would cost money and produce nothing readable.`,
+      );
+    }
+  }
+
+  const style = options.styleId ?? records.presets[0]?.styleId ?? 'hymn';
     const voice = options.voiceId ?? records.presets[0]?.voiceId ?? 'alto';
     const lines = [
       '',
@@ -147,11 +163,17 @@ export async function bakeoff(options: BakeoffOptions = {}): Promise<string> {
     // run, so this refuses instead. --allow-unscored is there for the case
     // where the audio itself is the point.
     if (!options.allowUnscored) {
-      // "Install whisper" is unhelpful to someone who just did; say which
-      // whisper answered and what it still needs.
-      const diagnosis = await whisperUnavailableReason();
+      // Say which of the two it is. "Nothing is configured" and "something is
+      // configured and does not work" need opposite responses, and telling
+      // someone to set variables they have already set sends them the wrong way.
+      const reasons = (
+        await Promise.all([whisperCliTranscriber, whisperApiTranscriber].map((t) => t.why?.() ?? null))
+      ).filter((r): r is string => Boolean(r));
+      const detail = reasons.length
+        ? ` What was found: ${reasons.join('; ')}.`
+        : ' Install whisper (whisper-cli or whisper on PATH), or set REFRAIN_ASR_URL and REFRAIN_ASR_KEY.';
       throw new Error(
-        `no transcriber is available, so word accuracy — the number this bake-off exists to produce — cannot be measured, and the renders would cost money without answering anything. Install whisper (whisper-cli or whisper on PATH), or set REFRAIN_ASR_URL and REFRAIN_ASR_KEY. Pass --allow-unscored to render anyway.${diagnosis ? `\n\n${diagnosis}` : ''}`,
+        `no transcriber is available, so word accuracy — the number this bake-off exists to produce — cannot be measured, and the renders would cost money without answering anything.${detail} Pass --allow-unscored to render anyway.`,
       );
     }
     progress(
@@ -236,11 +258,15 @@ export async function bakeoff(options: BakeoffOptions = {}): Promise<string> {
             }`,
           );
         } catch (error) {
-          // A failed render usually still costs money, so it counts against
-          // the budget unless the provider clearly refused before generating.
+          // A refused request generated nothing and is not billed; a failure
+          // after generation is. Any 4xx is the provider declining the call —
+          // an enumerated list of codes missed the 400 that ElevenLabs returns
+          // for a bad key, and charged the run for three calls it never made.
+          // 5xx stays chargeable: the audio may well have been produced.
           const message = error instanceof Error ? error.message : String(error);
-          const refused = /\b(401|403|404|422)\b/.test(message);
-          if (!refused) spent += provider.config.costPerRenderUsd;
+          const refused = /returned 4\d{2}\b/.test(message);
+          if (refused) attempt.costUsd = 0;
+          else spent += provider.config.costPerRenderUsd;
           attempt.error = message;
           progress(`FAIL ${label} — ${message.slice(0, 200)}`);
         }
@@ -282,7 +308,9 @@ export function summarise(attempts: Attempt[]): Summary[] {
       .map((a) => a.renderSeconds)
       .filter((s): s is number => typeof s === 'number');
     const usable = ok.filter((a) => a.report?.passed).length;
-    const cost = list.reduce((sum, a) => sum + (a.ok || !a.error ? a.costUsd : 0), 0);
+    // The attempt carries what it cost — zero when the provider refused it —
+    // so this and the "spent" headline are the same arithmetic.
+    const cost = list.reduce((sum, a) => sum + a.costUsd, 0);
 
     return {
       provider,

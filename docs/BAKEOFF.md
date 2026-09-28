@@ -14,7 +14,7 @@ npm run pipeline -- adapters          # what is configured, and whether its key 
 npm run pipeline -- bakeoff --dry-run # the exact prompt, the exact cost, nothing sent
 ```
 
-Skip the build and the first command fails with `Cannot find module .../pipeline/dist/cli.js`,
+Skip the build and the first command dies with `Cannot find module .../pipeline/dist/cli.js`,
 which reads like a broken checkout rather than a missing step.
 
 The dry run prints the prompt that would go to the provider. Read it. A bad prompt is the most
@@ -42,7 +42,7 @@ output is non-commercial only, while a paid subscriber "is considered the owner 
 commercial rights that survive cancellation — and the terms were adjusted after its Warner
 partnership, so read the current version rather than a summary.
 
-**3. Set the keys.** In the environment — nothing here reads `.env`.
+**3. Set the keys.**
 
 ```bash
 export ELEVENLABS_API_KEY=...
@@ -50,22 +50,9 @@ export REFRAIN_ASR_URL=https://api.openai.com/v1/audio/transcriptions
 export REFRAIN_ASR_KEY=...
 ```
 
-`.env.example` exists for the shape of the variables, not as a file the pipeline loads: the CLI
-reads `process.env` and there is no dotenv dependency. A key written into `.env` and left there
-produces `Missing keys:` on the dry run, with the key sitting in front of you looking correct. To
-keep using the file, load it yourself — `set -a; . ./.env; set +a`, or run the CLI directly with
-`node --env-file=.env packages/pipeline/dist/cli.js bakeoff --dry-run`.
-
 Without an ASR endpoint (or a local `whisper-cli`), the run produces audio and **no accuracy
 number** — which is the one thing it exists to produce. The command says so rather than quietly
 skipping it.
-
-Two unrelated programs answer to the name whisper, and only one of them works out of the box.
-`pip install -U openai-whisper` needs no further setup. `brew install whisper-cpp` gives you
-whisper.cpp, which ships no model — set `REFRAIN_WHISPER_MODEL` to a ggml model file or the run
-refuses before it spends. It refuses rather than warns because whisper.cpp exits 0 on an unknown
-argument, so a version of this that trusted the exit code would have paid for three renders and
-then reported accuracy as "not measured".
 
 ## Run it
 

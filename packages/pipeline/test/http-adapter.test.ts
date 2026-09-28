@@ -379,3 +379,30 @@ describe('bake-off summary', () => {
     expect(summary!.costPerUsableUsd).toBeNull();
   });
 });
+
+/**
+ * What a refused call costs.
+ *
+ * The headline and the table disagreed on a real run: three calls ElevenLabs
+ * rejected for a bad key were billed $0.30 in one place and $0.00 in the
+ * other. The refused-code list was enumerated and did not contain 400, which
+ * is what that provider answers for a bad key.
+ */
+describe('a refused render', () => {
+  const refused = (message: string) => /returned 4\d{2}\b/.test(message);
+
+  it('counts every 4xx as declined, not just the ones someone listed', () => {
+    for (const status of [400, 401, 402, 403, 404, 409, 422, 429]) {
+      expect(refused(`elevenlabs-music returned ${status}: {"detail":"nope"}`)).toBe(true);
+    }
+  });
+
+  it('still charges for a server error, which may have generated audio', () => {
+    expect(refused('elevenlabs-music returned 500: upstream')).toBe(false);
+    expect(refused('elevenlabs-music returned 503: busy')).toBe(false);
+  });
+
+  it('is not fooled by a number that happens to appear in a message', () => {
+    expect(refused('elevenlabs-music failed after 404 seconds of audio')).toBe(false);
+  });
+});
