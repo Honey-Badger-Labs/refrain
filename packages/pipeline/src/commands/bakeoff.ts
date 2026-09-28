@@ -115,8 +115,7 @@ export async function bakeoff(options: BakeoffOptions = {}): Promise<string> {
     );
   }
 
-  if (options.dryRun) {
-    // Every render comes back as MP3 and has to be decoded before a single check
+  // Every render comes back as MP3 and has to be decoded before a single check
   // can read it, so a missing ffmpeg makes the whole run worthless — and the
   // last one proved it, paying for three renders and discarding all three.
   // Same rule as the transcriber: refuse before spending, not after.
@@ -130,7 +129,8 @@ export async function bakeoff(options: BakeoffOptions = {}): Promise<string> {
     }
   }
 
-  const style = options.styleId ?? records.presets[0]?.styleId ?? 'hymn';
+  if (options.dryRun) {
+    const style = options.styleId ?? records.presets[0]?.styleId ?? 'hymn';
     const voice = options.voiceId ?? records.presets[0]?.voiceId ?? 'alto';
     const lines = [
       '',
