@@ -1,0 +1,21 @@
+{
+  "corpus": {
+    "id": "melodyflow-songs",
+    "title": "The MelodyFlow songbook",
+    "edition": "Standard sung texts, transcribed from common knowledge and NOT YET CHECKED against a printed source",
+    "author": "Traditional, with Jane Taylor, James Lord Pierpont and John Newton",
+    "licence": {
+      "id": "public-domain",
+      "name": "Public domain",
+      "note": "Every text here is out of copyright: traditional songs of unknown authorship, plus Jane Taylor (d. 1824), James Lord Pierpont (d. 1893) and John Newton (d. 1807). UNVERIFIED WORDING: the lines were written out from common knowledge, not copied from an edition, because the container they were prepared in could not reach Wikisource or Project Gutenberg. The rights position is not in doubt; the exact wording is. Check each against the source named in README.md before any of this is rendered and published. Five further MelodyFlow arrangements are deliberately absent: Hedwig's Theme, the Terminator theme, Low Rider, Can't Help Falling in Love and Somewhere in My Memory are all in copyright, and practising a tune privately is not the same act as publishing a render of it."
+    },
+    "sourceUrl": "https://github.com/Honey-Badger-Labs/melodyflow",
+    "description": "The singable public-domain half of the MelodyFlow songbook. MelodyFlow chose these songs and supplied the shortlist; it did not supply this text. It writes a song as note tokens for a 13-note C-major drum with a short label on each line, and those labels are phrase-sized, so what it holds is a fragment — one verse, one chorus, or in Scarborough Fair's case half a line. The texts here are completed to the standard sung version instead, which is why sourceUrl points at the selection rather than at the words. The melody does not come across: Refrain renders words, not tunes, so these are sung to a Refrain preset like any other chunk. Ode to Joy is absent because its labels are structural ('Rising phrase', 'home on 1') and it carries no words at all. See README.md for the per-song register and the verification each line still needs.",
+    "books": [
+      { "id": "melodyflow", "title": "From the MelodyFlow songbook", "order": 0 }
+    ]
+  },
+  "bookOf": {
+    "melodyflow": "melodyflow"
+  }
+}

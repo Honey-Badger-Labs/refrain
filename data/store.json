@@ -26,6 +26,26 @@
           "order": 1
         }
       ]
+    },
+    {
+      "id": "melodyflow-songs",
+      "title": "The MelodyFlow songbook",
+      "edition": "Standard sung texts, transcribed from common knowledge and NOT YET CHECKED against a printed source",
+      "author": "Traditional, with Jane Taylor, James Lord Pierpont and John Newton",
+      "licence": {
+        "id": "public-domain",
+        "name": "Public domain",
+        "note": "Every text here is out of copyright: traditional songs of unknown authorship, plus Jane Taylor (d. 1824), James Lord Pierpont (d. 1893) and John Newton (d. 1807). UNVERIFIED WORDING: the lines were written out from common knowledge, not copied from an edition, because the container they were prepared in could not reach Wikisource or Project Gutenberg. The rights position is not in doubt; the exact wording is. Check each against the source named in README.md before any of this is rendered and published. Five further MelodyFlow arrangements are deliberately absent: Hedwig's Theme, the Terminator theme, Low Rider, Can't Help Falling in Love and Somewhere in My Memory are all in copyright, and practising a tune privately is not the same act as publishing a render of it."
+      },
+      "sourceUrl": "https://github.com/Honey-Badger-Labs/melodyflow",
+      "description": "The singable public-domain half of the MelodyFlow songbook. MelodyFlow chose these songs and supplied the shortlist; it did not supply this text. It writes a song as note tokens for a 13-note C-major drum with a short label on each line, and those labels are phrase-sized, so what it holds is a fragment — one verse, one chorus, or in Scarborough Fair's case half a line. The texts here are completed to the standard sung version instead, which is why sourceUrl points at the selection rather than at the words. The melody does not come across: Refrain renders words, not tunes, so these are sung to a Refrain preset like any other chunk. Ode to Joy is absent because its labels are structural ('Rising phrase', 'home on 1') and it carries no words at all. See README.md for the per-song register and the verification each line still needs.",
+      "books": [
+        {
+          "id": "melodyflow",
+          "title": "From the MelodyFlow songbook",
+          "order": 0
+        }
+      ]
     }
   ],
   "styles": [
@@ -38,6 +58,21 @@
       "id": "folk",
       "name": "Folk",
       "description": "Brisker, four beats to the bar, a plucked accompaniment and a wider melody."
+    },
+    {
+      "id": "lullaby",
+      "name": "Lullaby",
+      "description": "Very slow, a rocking arpeggio underneath, a narrow melody and a long room."
+    },
+    {
+      "id": "chant",
+      "name": "Chant",
+      "description": "Plainsong: one chord held as a drone, no pulse to speak of, the words carrying the shape."
+    },
+    {
+      "id": "carol",
+      "name": "Carol",
+      "description": "Brisk and bright, an arpeggio accompaniment and the widest melodic arch."
     }
   ],
   "voices": [
@@ -52,6 +87,18 @@
       "name": "Treble",
       "source": "synthetic: additive synthesis in this repository, no human voice sampled or modelled",
       "description": "An octave up, brighter."
+    },
+    {
+      "id": "tenor",
+      "name": "Tenor",
+      "source": "synthetic: additive synthesis in this repository, no human voice sampled or modelled",
+      "description": "Lowest of the four, darker formants."
+    },
+    {
+      "id": "soprano",
+      "name": "Soprano",
+      "source": "synthetic: additive synthesis in this repository, no human voice sampled or modelled",
+      "description": "Highest and clearest, fewest harmonics."
     }
   ],
   "presets": [
@@ -96,6 +143,50 @@
       "adapter": "synth",
       "params": {
         "tempoScale": 0.96
+      },
+      "modelId": "refrain-synth"
+    },
+    {
+      "id": "lullaby-treble",
+      "mode": "sung",
+      "styleId": "lullaby",
+      "voiceId": "treble",
+      "adapter": "synth",
+      "params": {
+        "tempoScale": 1
+      },
+      "modelId": "refrain-synth"
+    },
+    {
+      "id": "chant-tenor",
+      "mode": "sung",
+      "styleId": "chant",
+      "voiceId": "tenor",
+      "adapter": "synth",
+      "params": {
+        "tempoScale": 1
+      },
+      "modelId": "refrain-synth"
+    },
+    {
+      "id": "carol-soprano",
+      "mode": "sung",
+      "styleId": "carol",
+      "voiceId": "soprano",
+      "adapter": "synth",
+      "params": {
+        "tempoScale": 1
+      },
+      "modelId": "refrain-synth"
+    },
+    {
+      "id": "hymn-tenor",
+      "mode": "sung",
+      "styleId": "hymn",
+      "voiceId": "tenor",
+      "adapter": "synth",
+      "params": {
+        "tempoScale": 0.98
       },
       "modelId": "refrain-synth"
     }
@@ -333,6 +424,119 @@
         "Thou dost smile,",
         "I sing the while;",
         "Sweet joy befall thee!"
+      ]
+    },
+    {
+      "id": "twinkle-twinkle-little-star",
+      "corpusId": "melodyflow-songs",
+      "bookId": "melodyflow",
+      "number": 1,
+      "title": "Twinkle, Twinkle, Little Star",
+      "lines": [
+        "Twinkle, twinkle, little star",
+        "How I wonder what you are",
+        "Up above the world so high",
+        "Like a diamond in the sky"
+      ]
+    },
+    {
+      "id": "old-macdonald-had-a-farm",
+      "corpusId": "melodyflow-songs",
+      "bookId": "melodyflow",
+      "number": 2,
+      "title": "Old MacDonald Had a Farm",
+      "lines": [
+        "Old MacDonald had a farm",
+        "E-I-E-I-O",
+        "And on that farm he had a cow",
+        "E-I-E-I-O",
+        "With a moo moo here",
+        "And a moo moo there",
+        "Here a moo, there a moo",
+        "Everywhere a moo moo",
+        "Old MacDonald had a farm",
+        "E-I-E-I-O"
+      ]
+    },
+    {
+      "id": "frere-jacques",
+      "corpusId": "melodyflow-songs",
+      "bookId": "melodyflow",
+      "number": 3,
+      "title": "Frère Jacques",
+      "lines": [
+        "Frère Jacques",
+        "Frère Jacques",
+        "Dormez-vous?",
+        "Dormez-vous?",
+        "Sonnez les matines",
+        "Sonnez les matines",
+        "Ding, ding, dong",
+        "Ding, ding, dong"
+      ]
+    },
+    {
+      "id": "jingle-bells",
+      "corpusId": "melodyflow-songs",
+      "bookId": "melodyflow",
+      "number": 4,
+      "title": "Jingle Bells",
+      "lines": [
+        "Dashing through the snow",
+        "In a one-horse open sleigh",
+        "O'er the fields we go",
+        "Laughing all the way",
+        "Bells on bobtail ring",
+        "Making spirits bright",
+        "What fun it is to ride and sing",
+        "A sleighing song tonight",
+        "Jingle bells, jingle bells",
+        "Jingle all the way",
+        "Oh what fun it is to ride",
+        "In a one-horse open sleigh"
+      ]
+    },
+    {
+      "id": "when-the-saints-go-marching-in",
+      "corpusId": "melodyflow-songs",
+      "bookId": "melodyflow",
+      "number": 5,
+      "title": "When the Saints Go Marching In",
+      "lines": [
+        "Oh, when the saints go marching in",
+        "Oh, when the saints go marching in",
+        "Oh, Lord, I want to be in that number",
+        "When the saints go marching in"
+      ]
+    },
+    {
+      "id": "scarborough-fair",
+      "corpusId": "melodyflow-songs",
+      "bookId": "melodyflow",
+      "number": 6,
+      "title": "Scarborough Fair",
+      "lines": [
+        "Are you going to Scarborough Fair?",
+        "Parsley, sage, rosemary and thyme",
+        "Remember me to one who lives there",
+        "For once she was a true love of mine"
+      ]
+    },
+    {
+      "id": "amazing-grace",
+      "corpusId": "melodyflow-songs",
+      "bookId": "melodyflow",
+      "number": 7,
+      "title": "Amazing Grace",
+      "lines": [
+        "Amazing grace! how sweet the sound",
+        "That saved a wretch like me!",
+        "I once was lost, but now am found,",
+        "Was blind, but now I see.",
+        "'Twas grace that taught my heart to fear,",
+        "And grace my fears relieved;",
+        "How precious did that grace appear",
+        "The hour I first believed!"
       ]
     }
   ],
