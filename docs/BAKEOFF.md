@@ -9,9 +9,13 @@ about the price of a lunch.
 ## Before you spend anything
 
 ```bash
+npm ci && npm run build               # `npm run pipeline` runs dist/, which npm ci does not create
 npm run pipeline -- adapters          # what is configured, and whether its key is set
 npm run pipeline -- bakeoff --dry-run # the exact prompt, the exact cost, nothing sent
 ```
+
+Skip the build and the first command dies with `Cannot find module .../pipeline/dist/cli.js`,
+which reads like a broken checkout rather than a missing step.
 
 The dry run prints the prompt that would go to the provider. Read it. A bad prompt is the most
 common reason a bake-off produces a number that means nothing, and it is free to fix at this point.
