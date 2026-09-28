@@ -18,22 +18,50 @@ import { RenderError, type RenderAdapter, type RenderRequest, type RenderResult 
  * And it costs nothing and needs no API key, so the whole pipeline runs in CI.
  *
  * A model-backed adapter implements the same interface and takes its place.
+ *
+ * Version 2 is a rewrite of what it plays rather than of how it is wired in.
+ * Three things were wrong with version 1, in the order they were audible.
+ *
+ * The harmony did not line up with itself. The melody took its chord from the
+ * line index and the accompaniment took its chord from a fixed bar grid, so
+ * the two walked at different speeds: on a three-line chunk every single line
+ * resolved onto a chord the pad was not playing. Chords now come from a plan
+ * built once and read by both, so a phrase and its accompaniment cannot drift
+ * apart by construction.
+ *
+ * The melody was a random walk. Each note stepped somewhere allowed rather
+ * than somewhere wanted, which is why it wandered: no contour, no cadence,
+ * nothing a listener could anticipate. A line is now shaped as an arch, chord
+ * tones land on stressed syllables and passing notes fill between them, and
+ * the seed varies the shape rather than generating it.
+ *
+ * And every syllable had the same length, which is what made it sound typed
+ * rather than sung. Stress comes from the words themselves — a syllable that
+ * begins a word is leant on, the rest are lighter.
  */
 
 const SAMPLE_RATE = 44100;
 const MAJOR_SCALE = [0, 2, 4, 5, 7, 9, 11] as const;
+/** How far the melody may roam, in scale degrees either side of the voice root. */
+const LOW_DEGREE = -3;
+const HIGH_DEGREE = 10;
 
-interface StyleShape {
+type Accompaniment = 'pad' | 'pluck' | 'arpeggio' | 'drone';
+
+export interface StyleShape {
   bpm: number;
   beatsPerSyllable: number;
   /** Scale degrees of the chord root, one per phrase. */
   progression: number[];
-  /** Melodic steps the style favours, in scale degrees. */
-  steps: number[];
-  accompaniment: 'pad' | 'pluck';
+  accompaniment: Accompaniment;
   swing: number;
   lineGapBeats: number;
   reverbMix: number;
+  /** Lowest and highest the arch reaches, in scale degrees. */
+  contour: [number, number];
+  /** How much the stressed syllables are leant on. 1 is flat. */
+  lilt: number;
+  accompanimentGain: number;
 }
 
 const STYLES: Record<string, StyleShape> = {
@@ -41,21 +69,62 @@ const STYLES: Record<string, StyleShape> = {
     bpm: 82,
     beatsPerSyllable: 0.75,
     progression: [0, 3, 4, 0],
-    steps: [-2, -1, -1, 0, 1, 1, 2],
     accompaniment: 'pad',
     swing: 0,
     lineGapBeats: 1,
     reverbMix: 0.26,
+    contour: [0, 4],
+    lilt: 1.25,
+    accompanimentGain: 0.34,
   },
   folk: {
     bpm: 112,
     beatsPerSyllable: 0.75,
     progression: [0, 4, 5, 3],
-    steps: [-3, -2, -1, 0, 1, 2, 3],
     accompaniment: 'pluck',
     swing: 0.12,
     lineGapBeats: 1,
     reverbMix: 0.14,
+    contour: [-1, 5],
+    lilt: 1.3,
+    accompanimentGain: 0.32,
+  },
+  lullaby: {
+    bpm: 62,
+    beatsPerSyllable: 1,
+    progression: [0, 5, 3, 4],
+    accompaniment: 'arpeggio',
+    swing: 0,
+    lineGapBeats: 1.5,
+    reverbMix: 0.34,
+    contour: [0, 3],
+    lilt: 1.15,
+    accompanimentGain: 0.26,
+  },
+  chant: {
+    // Plainsong: one chord, no pulse to speak of, the words carrying the shape.
+    bpm: 58,
+    beatsPerSyllable: 0.85,
+    progression: [0],
+    accompaniment: 'drone',
+    swing: 0,
+    lineGapBeats: 2,
+    reverbMix: 0.42,
+    contour: [0, 3],
+    lilt: 1.1,
+    accompanimentGain: 0.22,
+  },
+  carol: {
+    bpm: 98,
+    beatsPerSyllable: 0.7,
+    progression: [0, 4, 5, 4],
+    accompaniment: 'arpeggio',
+    swing: 0.06,
+    lineGapBeats: 1,
+    reverbMix: 0.2,
+    contour: [0, 5],
+    lilt: 1.35,
+    accompanimentGain: 0.3,
   },
 };
 
@@ -68,27 +137,45 @@ interface VoiceShape {
   vibratoCents: number;
   breath: number;
   /** Rough formant centres, which give the tone a vowel-ish colour. */
-  formants: [number, number];
+  formants: [number, number, number];
 }
 
 const VOICES: Record<string, VoiceShape> = {
   alto: {
     rootMidi: 57,
-    harmonics: 14,
+    harmonics: 16,
     brightness: 1.5,
     vibratoHz: 5.0,
-    vibratoCents: 18,
-    breath: 0.012,
-    formants: [700, 1180],
+    vibratoCents: 16,
+    breath: 0.01,
+    formants: [700, 1180, 2600],
   },
   treble: {
     rootMidi: 69,
-    harmonics: 11,
+    harmonics: 12,
     brightness: 1.9,
     vibratoHz: 5.6,
-    vibratoCents: 22,
-    breath: 0.008,
-    formants: [840, 1560],
+    vibratoCents: 20,
+    breath: 0.007,
+    formants: [840, 1560, 2900],
+  },
+  tenor: {
+    rootMidi: 50,
+    harmonics: 18,
+    brightness: 1.4,
+    vibratoHz: 4.7,
+    vibratoCents: 14,
+    breath: 0.011,
+    formants: [620, 1100, 2400],
+  },
+  soprano: {
+    rootMidi: 72,
+    harmonics: 10,
+    brightness: 2.1,
+    vibratoHz: 5.9,
+    vibratoCents: 24,
+    breath: 0.006,
+    formants: [900, 1700, 3100],
   },
 };
 
@@ -103,6 +190,15 @@ interface Note {
   start: number;
   duration: number;
   velocity: number;
+  /** Stressed notes get a firmer attack; unstressed ones stay soft. */
+  stressed: boolean;
+}
+
+/** One line's worth of music: when it runs, and what chord is under it. */
+interface Phrase {
+  start: number;
+  end: number;
+  chordRoot: number;
 }
 
 export const synthAdapter: RenderAdapter = {
@@ -140,35 +236,39 @@ export function renderSynth(request: RenderRequest): RenderResult {
   // key, short enough that a listener who pressed play hears something at once.
   const intro = beat * 2;
   const notes: Note[] = [];
+  const phrases: Phrase[] = [];
   const alignment: AlignmentSpan[] = [];
   let cursor = intro;
-  let degree = rng.pick([0, 2, 4]);
 
   lines.forEach((line, lineIndex) => {
-    const counts = tokenise(line).map((w) => syllables(w));
-    const total = counts.reduce((a, b) => a + b, 0) || 1;
-    const lineStart = cursor;
+    const stress = stressPattern(line);
+    const count = stress.length;
     const chordRoot = style.progression[lineIndex % style.progression.length]!;
+    const lineStart = cursor;
 
-    for (let i = 0; i < total; i++) {
-      const last = i === total - 1;
-      degree = nextDegree(degree, chordRoot, last, style, rng);
+    // A tilt per line so successive phrases are not the same arch twice, and
+    // so a different seed gives a different reading of the same chunk.
+    const tilt = rng.range(-0.6, 0.9);
+    const degrees = shapeLine(count, chordRoot, style, tilt, rng);
+
+    for (let i = 0; i < count; i++) {
+      const last = i === count - 1;
+      const stressed = stress[i]!;
       const swing = style.swing > 0 && i % 2 === 1 ? style.swing : 0;
-      const duration = beat * style.beatsPerSyllable * (last ? 1.9 : 1 + swing);
+      const weight = stressed ? style.lilt : 2 - style.lilt;
+      const duration = beat * style.beatsPerSyllable * (last ? 2.1 : weight + swing);
       notes.push({
-        midi: voice.rootMidi + scaleToSemitone(degree),
+        midi: voice.rootMidi + scaleToSemitone(degrees[i]!),
         start: cursor,
         duration,
-        velocity: last ? 0.9 : rng.range(0.72, 0.95),
+        velocity: last ? 0.88 : stressed ? rng.range(0.84, 0.95) : rng.range(0.66, 0.78),
+        stressed,
       });
       cursor += duration;
     }
 
-    alignment.push({
-      lineIndex,
-      start: round(lineStart),
-      end: round(cursor),
-    });
+    alignment.push({ lineIndex, start: round(lineStart), end: round(cursor) });
+    phrases.push({ start: lineStart, end: cursor, chordRoot });
     cursor += beat * style.lineGapBeats;
   });
 
@@ -181,11 +281,12 @@ export function renderSynth(request: RenderRequest): RenderResult {
   for (const note of notes) {
     renderVoiceNote(melody, note, voice, sampleRate, rng);
   }
-  renderAccompaniment(backing, notes, style, voice, beat, cursor + outro * 0.5, sampleRate, rng);
+  renderAccompaniment(backing, phrases, style, voice, beat, cursor + outro, sampleRate, rng);
 
   const mixed = new Float32Array(length);
+  const backingGain = style.accompanimentGain;
   for (let i = 0; i < length; i++) {
-    mixed[i] = melody[i]! * 0.82 + backing[i]! * 0.34;
+    mixed[i] = melody[i]! * 0.82 + backing[i]! * backingGain;
   }
   const wet = reverb(mixed, sampleRate, style.reverbMix);
   normalise(wet, (params.gain ?? 1) * 0.89);
@@ -196,37 +297,88 @@ export function renderSynth(request: RenderRequest): RenderResult {
     alignment,
     performed: [...lines],
     modelId: 'refrain-synth',
-    modelVersion: '1',
-    modelTerms: { commercialUse: true, version: 'in-repo', checkedOn: '2026-09-19' },
+    modelVersion: '2',
+    modelTerms: { commercialUse: true, version: 'in-repo', checkedOn: '2026-09-28' },
   };
 }
 
-function nextDegree(
-  current: number,
-  chordRoot: number,
-  resolve: boolean,
-  style: StyleShape,
-  rng: Rng,
-): number {
-  if (resolve) {
-    // End a line on a chord tone so phrases sound finished rather than cut off.
-    const tones = [chordRoot, chordRoot + 2, chordRoot + 4];
-    let best = tones[0]!;
-    let bestDistance = Infinity;
-    for (const tone of tones) {
-      const distance = Math.abs(tone - current);
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        best = tone;
-      }
-    }
-    return clamp(best, -2, 9);
+/**
+ * Which syllables carry the stress.
+ *
+ * English puts a beat on the first syllable of most short words, and the
+ * pipeline already knows where words begin and how many syllables each has.
+ * Leaning on those and lightening the rest is the cheapest thing that makes a
+ * line sound spoken rather than counted out.
+ */
+export function stressPattern(line: string): boolean[] {
+  const pattern: boolean[] = [];
+  for (const word of tokenise(line)) {
+    const count = Math.max(1, syllables(word));
+    for (let i = 0; i < count; i++) pattern.push(i === 0);
   }
-  const step = rng.pick(style.steps);
-  let next = current + step;
-  if (next > 9) next = 9 - (next - 9);
-  if (next < -2) next = -2 + (-2 - next);
-  return clamp(next, -2, 9);
+  return pattern.length > 0 ? pattern : [true];
+}
+
+/**
+ * The shape of one line: an arch that starts near the chord, rises, and comes
+ * home to a chord tone.
+ *
+ * Stressed syllables take chord tones so the harmony is stated by the melody
+ * rather than only by the accompaniment under it; the syllables between them
+ * take whatever scale degree the arch asks for, which is what makes them read
+ * as passing notes rather than as leaps.
+ */
+export function shapeLine(
+  count: number,
+  chordRoot: number,
+  style: StyleShape,
+  tilt: number,
+  rng: Rng,
+): number[] {
+  const [low, high] = style.contour;
+  const tones = [chordRoot, chordRoot + 2, chordRoot + 4, chordRoot + 7];
+  const degrees: number[] = [];
+  let previous = chordRoot;
+
+  for (let i = 0; i < count; i++) {
+    const position = count > 1 ? i / (count - 1) : 0;
+    const arch = low + (high - low) * Math.sin(Math.PI * position);
+    const target = arch + tilt;
+    const last = i === count - 1;
+
+    let degree: number;
+    if (last) {
+      // Come to rest on the chord, and prefer to arrive from above: a falling
+      // cadence is what makes a phrase sound finished.
+      degree = nearest(tones, Math.min(target, previous));
+    } else if (i === 0) {
+      degree = nearest(tones, target);
+    } else {
+      const wanted = Math.round(target);
+      // Keep it singable: no leap wider than a fourth between syllables.
+      const bounded = clamp(wanted, previous - 3, previous + 3);
+      degree = i % 2 === 0 ? nearest(tones, bounded) : bounded;
+      if (degree === previous && rng.next() < 0.4) degree = previous + (rng.next() < 0.5 ? 1 : -1);
+    }
+
+    degree = clamp(degree, LOW_DEGREE, HIGH_DEGREE);
+    degrees.push(degree);
+    previous = degree;
+  }
+  return degrees;
+}
+
+function nearest(candidates: number[], target: number): number {
+  let best = candidates[0]!;
+  let bestDistance = Infinity;
+  for (const candidate of candidates) {
+    const distance = Math.abs(candidate - target);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = candidate;
+    }
+  }
+  return best;
 }
 
 /** Scale degrees may run past an octave in either direction. */
@@ -248,15 +400,19 @@ function renderVoiceNote(
   rng: Rng,
 ): void {
   const start = Math.floor(note.start * sampleRate);
-  const length = Math.floor(note.duration * sampleRate);
+  // A little longer than its slot so the tail of one note is still sounding
+  // under the attack of the next. Without the overlap every syllable is an
+  // island and the line reads as separate events rather than a phrase.
+  const sung = note.duration * 1.12;
+  const length = Math.floor(sung * sampleRate);
   if (length <= 0) return;
   const freq = midiToHz(note.midi);
   const vibratoPhase = rng.range(0, Math.PI * 2);
-  const attack = Math.min(0.06, note.duration * 0.25);
-  const release = Math.min(0.14, note.duration * 0.4);
+  const attack = Math.min(note.stressed ? 0.035 : 0.07, sung * 0.3);
+  const release = Math.min(0.2, sung * 0.45);
+  // Singers arrive at a pitch rather than starting on it.
+  const scoop = note.stressed ? 0.018 : 0.03;
 
-  // Harmonic amplitudes, shaped by two broad formant bumps. Cheap, but it is
-  // the difference between a voice-ish tone and an organ.
   const amps: number[] = [];
   for (let h = 1; h <= voice.harmonics; h++) {
     const partial = freq * h;
@@ -265,28 +421,36 @@ function renderVoiceNote(
     const shape =
       formantGain(partial, voice.formants[0], 180) * 1.0 +
       formantGain(partial, voice.formants[1], 260) * 0.7 +
-      0.18;
+      formantGain(partial, voice.formants[2], 380) * 0.35 +
+      0.16;
     amps.push(rolloff * shape);
   }
   const ampSum = amps.reduce((a, b) => a + b, 0) || 1;
 
+  let breathState = 0;
   for (let i = 0; i < length; i++) {
     const index = start + i;
     if (index >= out.length) break;
     const t = i / sampleRate;
-    const env = envelope(t, note.duration, attack, release);
+    const env = envelope(t, sung, attack, release);
     if (env <= 0) continue;
+    const bend = t < scoop ? 1 - 0.028 * (1 - t / scoop) : 1;
     const vibrato =
       1 +
       (voice.vibratoCents / 1200) *
         Math.sin(2 * Math.PI * voice.vibratoHz * t + vibratoPhase) *
         Math.min(1, t / 0.25);
+    const ratio = bend * vibrato;
     let sample = 0;
     for (let h = 0; h < amps.length; h++) {
-      sample += amps[h]! * Math.sin(2 * Math.PI * freq * (h + 1) * vibrato * t);
+      sample += amps[h]! * Math.sin(2 * Math.PI * freq * (h + 1) * ratio * t);
     }
     sample /= ampSum;
-    if (voice.breath > 0) sample += (rng.next() * 2 - 1) * voice.breath * env;
+    if (voice.breath > 0) {
+      // One pole of smoothing turns hiss into air.
+      breathState = breathState * 0.86 + (rng.next() * 2 - 1) * 0.14;
+      sample += breathState * voice.breath * env;
+    }
     out[index] = out[index]! + sample * env * note.velocity;
   }
 }
@@ -296,48 +460,84 @@ function formantGain(freq: number, centre: number, width: number): number {
   return Math.exp(-0.5 * x * x);
 }
 
+/**
+ * Raised cosine in and out rather than a straight line: a linear ramp through
+ * zero is a corner, and a corner at this amplitude is an audible click at the
+ * start of every syllable.
+ */
 function envelope(t: number, duration: number, attack: number, release: number): number {
   if (t < 0 || t > duration) return 0;
-  if (t < attack) return t / attack;
+  if (t < attack) return 0.5 - 0.5 * Math.cos(Math.PI * (t / attack));
   const releaseStart = duration - release;
-  if (t > releaseStart) return Math.max(0, (duration - t) / release);
-  const decayed = 1 - 0.18 * Math.min(1, (t - attack) / Math.max(0.001, duration - attack));
-  return decayed;
+  if (t > releaseStart) {
+    const x = (duration - t) / release;
+    return 0.5 - 0.5 * Math.cos(Math.PI * clamp(x, 0, 1));
+  }
+  return 1 - 0.18 * Math.min(1, (t - attack) / Math.max(0.001, duration - attack));
 }
 
+/**
+ * The accompaniment follows the phrases, not a metronome.
+ *
+ * This is the fix for version 1's central fault: chords were placed on a fixed
+ * bar grid while the melody took its chord from the line, so the two drifted
+ * and lines resolved against the wrong triad. Both now read the same plan.
+ */
 function renderAccompaniment(
   out: Float32Array,
-  notes: Note[],
+  phrases: Phrase[],
   style: StyleShape,
   voice: VoiceShape,
   beat: number,
-  to: number,
+  end: number,
   sampleRate: number,
   rng: Rng,
 ): void {
-  const barBeats = style.accompaniment === 'pad' ? 3 : 4;
-  const barLength = beat * barBeats;
   const root = voice.rootMidi - 12;
-  let bar = 0;
-  for (let t = 0; t < to; t += barLength) {
-    const chordRoot = style.progression[bar % style.progression.length]!;
-    const triad = [chordRoot, chordRoot + 2, chordRoot + 4].map(
-      (d) => root + scaleToSemitone(d),
-    );
+  const first = phrases[0]!;
+
+  const triadOf = (chordRoot: number): number[] =>
+    [chordRoot, chordRoot + 2, chordRoot + 4].map((d) => root + scaleToSemitone(d));
+
+  if (style.accompaniment === 'drone') {
+    // One chord under the whole thing: root and fifth, the way a drone works.
+    const fifth = root + scaleToSemitone(first.chordRoot + 4);
+    renderSoftTone(out, root + scaleToSemitone(first.chordRoot), 0, end, sampleRate, 0.3);
+    renderSoftTone(out, fifth, 0, end, sampleRate, 0.2);
+    return;
+  }
+
+  // The intro states the chord the first line will resolve to.
+  const spans: Phrase[] = [
+    { start: 0, end: first.start, chordRoot: first.chordRoot },
+    ...phrases.map((phrase, i) => ({
+      start: phrase.start,
+      // Hold each chord through the gap until the next line starts.
+      end: i === phrases.length - 1 ? end : phrases[i + 1]!.start,
+      chordRoot: phrase.chordRoot,
+    })),
+  ];
+  for (const span of spans) {
+    const duration = span.end - span.start;
+    if (duration <= 0) continue;
+    const triad = triadOf(span.chordRoot);
+
     if (style.accompaniment === 'pad') {
       for (const midi of triad) {
-        renderSoftTone(out, midi, t, barLength * 0.98, sampleRate, 0.22);
+        renderSoftTone(out, midi, span.start, duration * 0.99, sampleRate, 0.22);
       }
-    } else {
-      const pattern = [0, 2, 1, 2];
-      for (let i = 0; i < barBeats; i++) {
-        const midi = triad[pattern[i % pattern.length]!]!;
-        renderPluck(out, midi, t + i * beat, beat * 0.9, sampleRate, 0.3, rng);
-      }
+      continue;
     }
-    bar++;
+
+    const step = style.accompaniment === 'arpeggio' ? beat * 0.5 : beat;
+    const pattern = style.accompaniment === 'arpeggio' ? [0, 1, 2, 1] : [0, 2, 1, 2];
+    let i = 0;
+    for (let t = span.start; t < span.end; t += step, i++) {
+      const midi = triad[pattern[i % pattern.length]!]!;
+      const gain = style.accompaniment === 'arpeggio' ? 0.22 : 0.3;
+      renderPluck(out, midi, t, Math.min(step * 1.6, span.end - t), sampleRate, gain, rng);
+    }
   }
-  void notes;
 }
 
 function renderSoftTone(
@@ -385,7 +585,7 @@ function renderPluck(
     if (index < 0) continue;
     if (index >= out.length) break;
     const t = i / sampleRate;
-    const env = Math.exp(-t * 6) * Math.min(1, t / 0.004);
+    const env = Math.exp(-t * 5) * Math.min(1, t / 0.006);
     const sample =
       Math.sin(2 * Math.PI * freq * t + phase) * 0.7 +
       Math.sin(2 * Math.PI * freq * 2.01 * t) * 0.2 +
@@ -443,6 +643,10 @@ function clamp(value: number, min: number, max: number): number {
 
 function round(seconds: number): number {
   return Math.round(seconds * 1000) / 1000;
+}
+
+export function styleShape(id: string): StyleShape | undefined {
+  return STYLES[id];
 }
 
 export const SYNTH_STYLES = Object.keys(STYLES);

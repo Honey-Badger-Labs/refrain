@@ -9,6 +9,21 @@
       "id": "folk",
       "name": "Folk",
       "description": "Brisker, four beats to the bar, a plucked accompaniment and a wider melody."
+    },
+    {
+      "id": "lullaby",
+      "name": "Lullaby",
+      "description": "Very slow, a rocking arpeggio underneath, a narrow melody and a long room."
+    },
+    {
+      "id": "chant",
+      "name": "Chant",
+      "description": "Plainsong: one chord held as a drone, no pulse to speak of, the words carrying the shape."
+    },
+    {
+      "id": "carol",
+      "name": "Carol",
+      "description": "Brisk and bright, an arpeggio accompaniment and the widest melodic arch."
     }
   ],
   "voices": [
@@ -23,6 +38,18 @@
       "name": "Treble",
       "source": "synthetic: additive synthesis in this repository, no human voice sampled or modelled",
       "description": "An octave up, brighter."
+    },
+    {
+      "id": "tenor",
+      "name": "Tenor",
+      "source": "synthetic: additive synthesis in this repository, no human voice sampled or modelled",
+      "description": "Lowest of the four, darker formants."
+    },
+    {
+      "id": "soprano",
+      "name": "Soprano",
+      "source": "synthetic: additive synthesis in this repository, no human voice sampled or modelled",
+      "description": "Highest and clearest, fewest harmonics."
     }
   ],
   "presets": [
@@ -32,7 +59,9 @@
       "styleId": "hymn",
       "voiceId": "alto",
       "adapter": "synth",
-      "params": { "tempoScale": 1 },
+      "params": {
+        "tempoScale": 1
+      },
       "modelId": "refrain-synth"
     },
     {
@@ -41,7 +70,9 @@
       "styleId": "hymn",
       "voiceId": "treble",
       "adapter": "synth",
-      "params": { "tempoScale": 1.05 },
+      "params": {
+        "tempoScale": 1.05
+      },
       "modelId": "refrain-synth"
     },
     {
@@ -50,7 +81,9 @@
       "styleId": "folk",
       "voiceId": "alto",
       "adapter": "synth",
-      "params": { "tempoScale": 1 },
+      "params": {
+        "tempoScale": 1
+      },
       "modelId": "refrain-synth"
     },
     {
@@ -59,7 +92,53 @@
       "styleId": "folk",
       "voiceId": "treble",
       "adapter": "synth",
-      "params": { "tempoScale": 0.96 },
+      "params": {
+        "tempoScale": 0.96
+      },
+      "modelId": "refrain-synth"
+    },
+    {
+      "id": "lullaby-treble",
+      "mode": "sung",
+      "styleId": "lullaby",
+      "voiceId": "treble",
+      "adapter": "synth",
+      "params": {
+        "tempoScale": 1
+      },
+      "modelId": "refrain-synth"
+    },
+    {
+      "id": "chant-tenor",
+      "mode": "sung",
+      "styleId": "chant",
+      "voiceId": "tenor",
+      "adapter": "synth",
+      "params": {
+        "tempoScale": 1
+      },
+      "modelId": "refrain-synth"
+    },
+    {
+      "id": "carol-soprano",
+      "mode": "sung",
+      "styleId": "carol",
+      "voiceId": "soprano",
+      "adapter": "synth",
+      "params": {
+        "tempoScale": 1
+      },
+      "modelId": "refrain-synth"
+    },
+    {
+      "id": "hymn-tenor",
+      "mode": "sung",
+      "styleId": "hymn",
+      "voiceId": "tenor",
+      "adapter": "synth",
+      "params": {
+        "tempoScale": 0.98
+      },
       "modelId": "refrain-synth"
     }
   ]

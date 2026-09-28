@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { Chunk, Preset } from '@refrain/catalogue';
-import { renderSynth } from '../src/render/synth.js';
+import {
+  renderSynth,
+  shapeLine,
+  stressPattern,
+  styleShape,
+  SYNTH_STYLES,
+  SYNTH_VOICES,
+} from '../src/render/synth.js';
 import { RenderError } from '../src/render/types.js';
 import { peak } from '../src/audio/wav.js';
 import { makeRng, seedFrom } from '../src/render/random.js';
@@ -124,5 +131,59 @@ describe('deterministic randomness', () => {
 
   it('refuses to pick from nothing', () => {
     expect(() => makeRng(1).pick([])).toThrow();
+  });
+});
+
+describe('what the synth plays', () => {
+  /**
+   * Version 1 resolved lines onto chord tones too; what it got wrong was the
+   * accompaniment, which read a fixed bar grid instead of the line, so the pad
+   * was usually holding a different triad by the time the melody landed. That
+   * fault is now shut out by the types rather than by a test —
+   * `renderAccompaniment` is handed the phrases and has no bar counter to
+   * drift with — so what is worth asserting here is the other half of the
+   * contract: the melody still states the chord it is being accompanied by.
+   */
+  it('ends every line on a tone of that line\'s chord', () => {
+    const style = styleShape('hymn')!;
+    for (const chordRoot of [0, 3, 4, 5]) {
+      const tones = new Set([chordRoot, chordRoot + 2, chordRoot + 4, chordRoot + 7]);
+      for (let count = 1; count <= 12; count++) {
+        const rng = makeRng(seedFrom('chunk', 'hymn-alto', count));
+        const degrees = shapeLine(count, chordRoot, style, 0, rng);
+        expect(degrees).toHaveLength(count);
+        expect(tones.has(degrees[count - 1]!)).toBe(true);
+      }
+    }
+  });
+
+  it('never leaps further than a fourth between syllables', () => {
+    const style = styleShape('carol')!;
+    const rng = makeRng(seedFrom('chunk', 'carol-soprano', 1));
+    const degrees = shapeLine(16, 0, style, 0.5, rng);
+    for (let i = 1; i < degrees.length; i++) {
+      expect(Math.abs(degrees[i]! - degrees[i - 1]!)).toBeLessThanOrEqual(4);
+    }
+  });
+
+  it('leans on the syllable that begins each word', () => {
+    // "Little Lamb who made thee" — Lit-tle Lamb who made thee.
+    expect(stressPattern('Little Lamb who made thee')).toEqual([
+      true, false, true, true, true, true,
+    ]);
+  });
+
+  it('renders every declared style and voice', () => {
+    for (const styleId of SYNTH_STYLES) {
+      for (const voiceId of SYNTH_VOICES) {
+        const result = renderSynth({
+          ...request,
+          preset: { ...preset, id: `${styleId}-${voiceId}`, styleId, voiceId },
+        });
+        expect(result.samples.length).toBeGreaterThan(0);
+        expect(peak(result.samples)).toBeGreaterThan(0.1);
+        expect(result.alignment).toHaveLength(chunk.lines.length);
+      }
+    }
   });
 });
