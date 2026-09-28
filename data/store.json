@@ -26,6 +26,26 @@
           "order": 1
         }
       ]
+    },
+    {
+      "id": "melodyflow-songs",
+      "title": "The MelodyFlow songbook",
+      "edition": "The phrase labels as written in the MelodyFlow arrangements, September 2026",
+      "author": "Traditional, with Jane Taylor, James Lord Pierpont and John Newton",
+      "licence": {
+        "id": "public-domain",
+        "name": "Public domain",
+        "note": "Every text here is out of copyright: traditional songs of unknown authorship, plus Jane Taylor (d. 1824), James Lord Pierpont (d. 1893) and John Newton (d. 1807). Five further MelodyFlow arrangements are deliberately absent. Hedwig's Theme, the Terminator theme, Low Rider, Can't Help Falling in Love and Somewhere in My Memory are all in copyright, and practising a tune privately is not the same act as publishing a render of it. They stay in MelodyFlow, which publishes no audio."
+      },
+      "sourceUrl": "https://github.com/Honey-Badger-Labs/melodyflow",
+      "description": "The singable public-domain half of the MelodyFlow songbook, carried across as text. MelodyFlow writes a song as note tokens for a 13-note C-major drum, with a short label on each line; for these seven the label is the lyric, and the label is all that is taken. The melody does not come with it — Refrain renders words, not tunes, so these are sung to a Refrain preset like any other chunk. What lands is therefore an excerpt and not a complete text: MelodyFlow's labels are sized to a musical phrase, so most of these are one verse or one chorus, and Scarborough Fair stops mid-line where the arrangement stops. Ode to Joy was left out because its labels are structural ('Rising phrase', 'home on 1') and it carries no words at all. See README.md for the per-song register.",
+      "books": [
+        {
+          "id": "melodyflow",
+          "title": "From the MelodyFlow songbook",
+          "order": 0
+        }
+      ]
     }
   ],
   "styles": [
@@ -333,6 +353,96 @@
         "Thou dost smile,",
         "I sing the while;",
         "Sweet joy befall thee!"
+      ]
+    },
+    {
+      "id": "twinkle-twinkle-little-star",
+      "corpusId": "melodyflow-songs",
+      "bookId": "melodyflow",
+      "number": 1,
+      "title": "Twinkle, Twinkle, Little Star",
+      "lines": [
+        "Twinkle, twinkle, little star",
+        "How I wonder what you are",
+        "Up above the world so high",
+        "Like a diamond in the sky"
+      ]
+    },
+    {
+      "id": "old-macdonald-had-a-farm",
+      "corpusId": "melodyflow-songs",
+      "bookId": "melodyflow",
+      "number": 2,
+      "title": "Old MacDonald Had a Farm",
+      "lines": [
+        "Old MacDonald had a farm",
+        "E-I-E-I-O",
+        "And on that farm he had a cow",
+        "E-I-E-I-O"
+      ]
+    },
+    {
+      "id": "frere-jacques",
+      "corpusId": "melodyflow-songs",
+      "bookId": "melodyflow",
+      "number": 3,
+      "title": "Frère Jacques",
+      "lines": [
+        "Frère Jacques",
+        "Frère Jacques",
+        "Dormez-vous?",
+        "Sonnez les matines",
+        "Ding, ding, dong"
+      ]
+    },
+    {
+      "id": "jingle-bells",
+      "corpusId": "melodyflow-songs",
+      "bookId": "melodyflow",
+      "number": 4,
+      "title": "Jingle Bells",
+      "lines": [
+        "Jingle bells, jingle bells",
+        "Jingle all the way",
+        "Oh what fun it is to ride",
+        "In a one-horse open sleigh"
+      ]
+    },
+    {
+      "id": "when-the-saints-go-marching-in",
+      "corpusId": "melodyflow-songs",
+      "bookId": "melodyflow",
+      "number": 5,
+      "title": "When the Saints Go Marching In",
+      "lines": [
+        "Oh when the saints",
+        "go marching in",
+        "Oh when the saints go marching in",
+        "Oh how I want to be in that number"
+      ]
+    },
+    {
+      "id": "scarborough-fair",
+      "corpusId": "melodyflow-songs",
+      "bookId": "melodyflow",
+      "number": 6,
+      "title": "Scarborough Fair",
+      "lines": [
+        "Are you going",
+        "to Scarborough Fair",
+        "Parsley, sage"
+      ]
+    },
+    {
+      "id": "amazing-grace",
+      "corpusId": "melodyflow-songs",
+      "bookId": "melodyflow",
+      "number": 7,
+      "title": "Amazing Grace",
+      "lines": [
+        "Amazing grace",
+        "how sweet the sound",
+        "that saved a wretch like me"
       ]
     }
   ],
