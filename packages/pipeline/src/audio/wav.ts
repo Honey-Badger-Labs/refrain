@@ -51,3 +51,26 @@ export function rms(samples: Float32Array, from = 0, to = samples.length): numbe
   for (let i = start; i < end; i++) sum += samples[i]! * samples[i]!;
   return Math.sqrt(sum / (end - start));
 }
+
+/**
+ * Bring the peak down to a headroom target before the file is written.
+ *
+ * Decoding a lossy render routinely lands above 1.0 without anything being
+ * wrong, but `encodeWav` writes 16-bit integers and clamps — so storing that
+ * signal unchanged manufactures the clipping the check then reports. The first
+ * bake-off did exactly this: three renders decoded at peaks of 1.34, 1.15 and
+ * 1.12, and were saved flat-topped. The audio was fine; we broke it on the way
+ * to disk.
+ *
+ * Quiet audio is left alone. This is headroom, not loudness matching, and
+ * lifting a deliberately soft take to the same peak as a loud one is a
+ * different job with different rules.
+ */
+export function normalisePeak(samples: Float32Array, target = 0.891): Float32Array {
+  const top = peak(samples);
+  if (top <= target || top === 0) return samples;
+  const gain = target / top;
+  const out = new Float32Array(samples.length);
+  for (let i = 0; i < samples.length; i++) out[i] = samples[i]! * gain;
+  return out;
+}

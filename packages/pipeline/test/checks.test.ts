@@ -78,9 +78,18 @@ describe('auto checks', () => {
   });
 
   it('fails a clipped render', () => {
-    const samples = tone(8, 1.4);
+    // Clipped means clamped: the waveform hit the ceiling and stopped there.
+    // A loud-but-smooth signal is a level to fix and is checked separately —
+    // this fixture used to be `tone(8, 1.4)`, which is the loud case, and it
+    // was failing renders that nothing was wrong with.
+    const samples = tone(8, 1.4).map((v) => Math.max(-1, Math.min(1, v)));
     const report = runChecks({ ...base, samples, alignment: [] });
     expect(statusOf(report, 'clipping')).toBe('fail');
+  });
+
+  it('passes a render that is merely too loud, which normalising fixes', () => {
+    const report = runChecks({ ...base, samples: tone(8, 1.4), alignment: [] });
+    expect(statusOf(report, 'clipping')).toBe('pass');
   });
 
   it('reports accuracy as skipped, not passed, when nothing listened', () => {
@@ -164,5 +173,80 @@ describe('the default transcriber', () => {
   it('is available and honestly returns nothing', async () => {
     await expect(nullTranscriber.available()).resolves.toBe(true);
     await expect(nullTranscriber.transcribe('anything.wav')).resolves.toBeNull();
+  });
+});
+
+/**
+ * A bake-off scored 85.4% and its report said the model was "not usable for a
+ * text-faithful library". The same audio, compared on what was sung rather
+ * than how it was spelled, scored 96.9%. The gap was Blake's orthography and a
+ * weak transcriber — and this check is the gate that decides publishable.
+ */
+describe('accuracy on archaic text', () => {
+  const sung = (lines: string[], transcript: string) =>
+    runChecks({ ...base, lines, transcript, samples: tone(8) }).results.find((r) => r.id === 'accuracy')!;
+
+  it('does not count a modern spelling as a mistake', () => {
+    const r = sung(
+      ["I wander thro' each charter'd street", 'Tyger Tyger burning bright'],
+      'I wander through each chartered street Tiger Tiger burning bright',
+    );
+    expect(r.status).toBe('pass');
+    expect(r.detail).toMatch(/100\.0% of words matched/);
+  });
+
+  it('says how many differences it set aside, so the number can be read', () => {
+    const r = sung(["The charter'd Thames"], 'The chartered Thames');
+    expect(r.detail).toMatch(/spelling-only difference not counted/);
+    expect(r.detail).toMatch(/charter'd\/chartered/);
+  });
+
+  it('still fails a word that was actually dropped', () => {
+    const r = sung(["I wander thro' each charter'd street"], 'I wander through each street');
+    expect(r.status).toBe('fail');
+    expect(r.detail).toMatch(/dropped/);
+  });
+
+  it('still fails a word that was actually changed', () => {
+    const r = sung(['The invisible worm'], 'The invisible one');
+    expect(r.status).toBe('fail');
+    expect(r.detail).toMatch(/worm→one/);
+  });
+});
+
+/**
+ * Decoding MP3 puts samples above the original peak on audio that never
+ * clipped. The first bake-off failed all three renders for it, at 1.34, 1.15
+ * and 1.12 — a level to fix, not information destroyed.
+ */
+describe('clipping', () => {
+  const clip = (samples: Float32Array) =>
+    runChecks({ ...base, samples }).results.find((r) => r.id === 'clipping')!;
+
+  const hot = (peakValue: number, flatRun = 0) => {
+    const s = tone(2);
+    for (let i = 0; i < s.length; i++) s[i] = s[i]! * peakValue;
+    // Isolated overshoot: single samples over the ceiling, no two adjacent.
+    for (let i = 500; i < 900; i += 7) s[i] = peakValue;
+    for (let i = 0; i < flatRun; i++) s[2000 + i] = 1;
+    return s;
+  };
+
+  it('passes audio that overshoots without flat-topping', () => {
+    const r = clip(hot(1.34));
+    expect(r.status).toBe('pass');
+    expect(r.detail).toMatch(/decoder overshoot/);
+  });
+
+  it('fails audio whose waveform stops at the ceiling and stays there', () => {
+    const r = clip(hot(1.0, 400));
+    expect(r.status).toBe('fail');
+    expect(r.detail).toMatch(/flat-topped/);
+  });
+
+  it('says nothing about overshoot when the peak is where it should be', () => {
+    const r = clip(tone(2, 0.8));
+    expect(r.status).toBe('pass');
+    expect(r.detail).not.toMatch(/overshoot/);
   });
 });

@@ -1,6 +1,6 @@
 import type { AlignmentSpan } from '@refrain/catalogue';
 import { peak, rms } from '../audio/wav.js';
-import { diffWords, syllablesInLine, tokenise } from '../text/words.js';
+import { diffWords, syllablesInLine, tokenise, sungForm, sameWhenSung } from '../text/words.js';
 
 /**
  * Auto checks.
@@ -50,6 +50,10 @@ export interface Thresholds {
   /** Sample magnitude at or above which a sample counts as clipped. */
   clipLevel: number;
   maxClippedSamples: number;
+  /** Consecutive samples at the ceiling before it counts as flat-topped. */
+  minClippedRun: number;
+  /** How still a sample has to be, against its neighbour, to count as pinned. */
+  flatEpsilon: number;
   minWordAccuracy: number;
 }
 
@@ -62,6 +66,12 @@ export const DEFAULT_THRESHOLDS: Thresholds = {
   maxLeadOutSeconds: 5,
   clipLevel: 0.999,
   maxClippedSamples: 8,
+  // Three in a row at the ceiling is a flat top. One or two is a codec
+  // reconstructing a peak slightly high, which normalising fixes.
+  minClippedRun: 3,
+  // A 16-bit step is 1/32768. Anything moving less than that between samples,
+  // while at the ceiling, is not moving.
+  flatEpsilon: 1 / 32768,
   minWordAccuracy: 0.99,
 };
 
@@ -153,16 +163,52 @@ function checkSilence(input: CheckInput, t: Thresholds): CheckResult {
   };
 }
 
+/**
+ * Clipping is a flat top, not a loud peak.
+ *
+ * Decoding a lossy file overshoots: reconstructing a waveform from MP3 puts
+ * samples above the original's peak, routinely past 1.0, on audio that was
+ * never clipped and sounds perfect once the level is brought down. Counting
+ * every sample over the ceiling therefore fails good renders — it failed all
+ * three of the first bake-off's, at peaks of 1.34, 1.15 and 1.12.
+ *
+ * Destroyed audio looks different: the waveform stops at the ceiling and stays
+ * there, so the samples come in runs. Isolated overshoot is a level to fix;
+ * a run is information that has already been lost. This counts the runs.
+ */
 function checkClipping(input: CheckInput, t: Thresholds): CheckResult {
-  let clipped = 0;
-  for (let i = 0; i < input.samples.length; i++) {
-    if (Math.abs(input.samples[i]!) >= t.clipLevel) clipped++;
+  // Flat, not merely high. A smooth waveform peaking above the ceiling spends
+  // several samples up there and every one of them differs from the last; a
+  // clipped one stops dead and repeats the same value. The test is therefore
+  // "at the ceiling AND not moving", which separates a level that needs
+  // normalising from information that has already been thrown away.
+  let flat = 0;
+  let longest = 0;
+  let run = 0;
+  for (let i = 1; i < input.samples.length; i++) {
+    const here = input.samples[i]!;
+    const before = input.samples[i - 1]!;
+    const pinned = Math.abs(here) >= t.clipLevel && Math.abs(here - before) < t.flatEpsilon;
+    if (pinned) {
+      run++;
+      if (run > longest) longest = run;
+    } else {
+      if (run >= t.minClippedRun) flat += run;
+      run = 0;
+    }
   }
-  const ok = clipped <= t.maxClippedSamples;
+  if (run >= t.minClippedRun) flat += run;
+
+  const top = peak(input.samples);
+  const ok = flat <= t.maxClippedSamples;
+  const note =
+    ok && top > 1
+      ? `, which is decoder overshoot rather than clipping — normalise before publishing`
+      : '';
   return {
     id: 'clipping',
     status: ok ? 'pass' : 'fail',
-    detail: `peak ${peak(input.samples).toFixed(3)}, ${clipped} clipped samples`,
+    detail: `peak ${top.toFixed(3)}, ${flat} samples flat-topped, longest run ${longest}${note}`,
   };
 }
 
@@ -204,7 +250,16 @@ function checkAccuracy(
   }
   const expected = tokenise(input.lines.join('\n'));
   const actual = tokenise(input.transcript);
-  const diff = diffWords(expected, actual);
+
+  // Judged on what was sung, not on how it was spelled. A bake-off scored
+  // 85.4% and was called unusable; the same audio, compared this way and
+  // transcribed by a model worth the name, scored 96.9%. The gap was entirely
+  // Blake's orthography and a weak transcriber, and a gate that cannot tell
+  // those from a dropped word rejects good work.
+  const diff = diffWords(expected.map(sungForm), actual.map(sungForm));
+  const written = diffWords(expected, actual);
+  const spelling = written.substituted.filter(([a, b]) => sameWhenSung(a, b));
+
   const ok = diff.accuracy >= t.minWordAccuracy;
   const problems: string[] = [];
   if (diff.deleted.length) problems.push(`dropped ${diff.deleted.slice(0, 6).join(', ')}`);
@@ -217,11 +272,20 @@ function checkAccuracy(
         .join(', ')}`,
     );
   }
+  // Said out loud, because it is the difference between the two numbers and
+  // the reason the strict one should not be quoted on its own.
+  const aside = spelling.length
+    ? ` (${spelling.length} spelling-only ${spelling.length === 1 ? 'difference' : 'differences'} not counted: ${spelling
+        .slice(0, 4)
+        .map(([a, b]) => `${a}/${b}`)
+        .join(', ')})`
+    : '';
+
   return {
     result: {
       id: 'accuracy',
       status: ok ? 'pass' : 'fail',
-      detail: `${(diff.accuracy * 100).toFixed(1)}% of words matched${problems.length ? `: ${problems.join('; ')}` : ''}`,
+      detail: `${(diff.accuracy * 100).toFixed(1)}% of words matched${problems.length ? `: ${problems.join('; ')}` : ''}${aside}`,
     },
     wordAccuracy: diff.accuracy,
   };

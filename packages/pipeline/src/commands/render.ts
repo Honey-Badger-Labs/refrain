@@ -4,7 +4,7 @@ import { hashValue, sha256Hex, trackId, type Track } from '@refrain/catalogue';
 import { resolvePaths, ensureDir } from '../paths.js';
 import { JsonStore, upsert, upsertProvenance } from '../store.js';
 import { prepareLyrics } from '../text/lyricprep.js';
-import { encodeWav } from '../audio/wav.js';
+import { encodeWav, normalisePeak } from '../audio/wav.js';
 import { assertFfmpeg, encode, CODEC_SETTINGS, type Codec } from '../audio/encode.js';
 import { getAdapter } from '../render/types.js';
 import { runChecks, type CheckReport } from '../checks/autochecks.js';
@@ -86,7 +86,12 @@ export async function render(options: RenderOptions = {}): Promise<string> {
       const adapter = getAdapter(preset.adapter);
       const result = await adapter.render({ chunk, preset, lines, seed, sampleRate });
 
-      fs.writeFileSync(wavPath, encodeWav(result.samples, { sampleRate: result.sampleRate }));
+      // Headroom before writing: 16-bit clamps, so an overshooting render would
+      // be flat-topped by being saved rather than by anything the model did.
+      fs.writeFileSync(
+        wavPath,
+        encodeWav(normalisePeak(result.samples), { sampleRate: result.sampleRate }),
+      );
       const encoded = [];
       for (const codec of formats) {
         encoded.push(await encode(wavPath, stem, codec));

@@ -19,6 +19,35 @@ export function tokenise(text: string): string[] {
     .filter(Boolean);
 }
 
+/**
+ * The word as it is sung, rather than as it was printed in 1794.
+ *
+ * An apostrophe in "charter'd" stands for the elided e and is sung exactly as
+ * "chartered"; "tyger" is the spelling of a word pronounced "tiger". A
+ * transcriber writes down what it hears, in modern spelling, so comparing the
+ * page to the transcript marks a faithful performance wrong — and the check
+ * that does so is the gate deciding whether a render is publishable.
+ *
+ * This normalises both sides of that comparison. It never touches the text
+ * itself: the corpus keeps Blake's spelling, invariant 3 is untouched, and
+ * what changes is only how two pieces of text are judged the same.
+ */
+export function sungForm(word: string): string {
+  return word
+    .replace(/^tyger$/, 'tiger')
+    .replace(/'d$/, 'ed')
+    .replace(/'ning$/, 'ening')
+    .replace(/'st$/, 'est')
+    .replace(/^thro'?$/, 'through')
+    .replace(/'s$/, 's')
+    .replace(/'/g, '');
+}
+
+/** Two words that differ only in how the century spelled them. */
+export function sameWhenSung(a: string, b: string): boolean {
+  return a !== b && sungForm(a) === sungForm(b);
+}
+
 export interface WordDiff {
   /** 1 means every word matched in order. */
   accuracy: number;

@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { encodeWav, peak } from '../audio/wav.js';
+import { encodeWav, normalisePeak, peak } from '../audio/wav.js';
 import { assertFfmpeg } from '../audio/encode.js';
 import { ensureDir, resolvePaths } from '../paths.js';
 import { JsonStore } from '../store.js';
@@ -230,9 +230,13 @@ export async function bakeoff(options: BakeoffOptions = {}): Promise<string> {
           attempt.renderSeconds = (Date.now() - started) / 1000;
 
           const audioPath = path.join(outDir, `${provider.config.name}--${chunk.id}--${run}.wav`);
+          // Headroom before writing. `encodeWav` clamps to 16 bits, so a render
+          // that decoded above 1.0 — which lossy audio routinely does — would be
+          // flat-topped by the act of saving it, and every check downstream
+          // would be judging damage this pipeline caused.
           fs.writeFileSync(
             audioPath,
-            encodeWav(result.samples, { sampleRate: result.sampleRate }),
+            encodeWav(normalisePeak(result.samples), { sampleRate: result.sampleRate }),
           );
           attempt.audioPath = path.relative(paths.root, audioPath);
           attempt.seconds = result.samples.length / result.sampleRate;
