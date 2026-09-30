@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Chunk, Preset } from '@refrain/catalogue';
 import {
+  accompanimentVoicing,
   renderSynth,
   shapeLine,
   stressPattern,
@@ -185,5 +186,38 @@ describe('what the synth plays', () => {
         expect(result.alignment).toHaveLength(chunk.lines.length);
       }
     }
+  });
+});
+
+describe('the accompaniment voicing', () => {
+  const midiHz = (midi: number) => 440 * Math.pow(2, (midi - 69) / 12);
+
+  /**
+   * The roughness this guards is measurable before a note is rendered. A close
+   * triad on the pad root put a major third about 29 Hz above a 110 Hz root,
+   * which is the middle of the critical band at that pitch and so where two
+   * partials beat hardest; measured on the rendered intro it more than halved
+   * when the voicing opened. Any chord that puts its third within a critical
+   * bandwidth of its root down here brings the grit back.
+   */
+  it('never spaces the two lowest notes inside a critical band', () => {
+    // Every pad root the four voices use: rootMidi - 12.
+    for (const root of [57 - 12, 69 - 12, 50 - 12, 72 - 12]) {
+      for (let chordRoot = 0; chordRoot < 7; chordRoot++) {
+        const notes = accompanimentVoicing(chordRoot, root).sort((a, b) => a - b);
+        const low = midiHz(notes[0]!);
+        const next = midiHz(notes[1]!);
+        // Approximate critical bandwidth at the lower tone (Glasberg & Moore).
+        const bandwidth = 24.7 * (0.00437 * low + 1);
+        expect(next - low).toBeGreaterThan(bandwidth);
+      }
+    }
+  });
+
+  it('puts the third above the fifth rather than between root and fifth', () => {
+    const root = 45;
+    const [first, second, third] = accompanimentVoicing(0, root);
+    expect(second! - first!).toBe(7);
+    expect(third!).toBeGreaterThan(second!);
   });
 });
