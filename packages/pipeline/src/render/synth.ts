@@ -131,51 +131,58 @@ const STYLES: Record<string, StyleShape> = {
 interface VoiceShape {
   /** MIDI note of scale degree 0. */
   rootMidi: number;
-  harmonics: number;
-  brightness: number;
+  /**
+   * Spectral tilt of the glottal source, as the exponent in 1/h^tilt. A real
+   * glottal pulse falls off around 12 dB per octave, which is near 2; lower
+   * values keep more edge in the source for the formants to work on.
+   */
+  tilt: number;
   vibratoHz: number;
   vibratoCents: number;
-  breath: number;
-  /** Rough formant centres, which give the tone a vowel-ish colour. */
+  /** Aspiration noise, mixed into the source before the formants, not after. */
+  aspiration: number;
+  /** The three formant centres that make this voice the vowel it is. */
   formants: [number, number, number];
+  /** Q of each formant. Higher is a narrower, more vocal resonance. */
+  formantQ: [number, number, number];
 }
 
 const VOICES: Record<string, VoiceShape> = {
   alto: {
     rootMidi: 57,
-    harmonics: 16,
-    brightness: 1.5,
+    tilt: 1.9,
     vibratoHz: 5.0,
     vibratoCents: 16,
-    breath: 0.01,
+    aspiration: 0.05,
     formants: [700, 1180, 2600],
+    formantQ: [7.5, 10, 12],
   },
   treble: {
     rootMidi: 69,
-    harmonics: 12,
-    brightness: 1.9,
+    tilt: 1.75,
     vibratoHz: 5.6,
     vibratoCents: 20,
-    breath: 0.007,
+    aspiration: 0.04,
     formants: [840, 1560, 2900],
+    formantQ: [8, 11, 13],
   },
   tenor: {
     rootMidi: 50,
-    harmonics: 18,
-    brightness: 1.4,
+    tilt: 2.0,
     vibratoHz: 4.7,
     vibratoCents: 14,
-    breath: 0.011,
+    aspiration: 0.055,
     formants: [620, 1100, 2400],
+    formantQ: [7, 9.5, 11],
   },
   soprano: {
     rootMidi: 72,
-    harmonics: 10,
-    brightness: 2.1,
+    tilt: 1.65,
     vibratoHz: 5.9,
     vibratoCents: 24,
-    breath: 0.006,
+    aspiration: 0.035,
     formants: [900, 1700, 3100],
+    formantQ: [8.5, 12, 14],
   },
 };
 
@@ -297,8 +304,8 @@ export function renderSynth(request: RenderRequest): RenderResult {
     alignment,
     performed: [...lines],
     modelId: 'refrain-synth',
-    modelVersion: '2',
-    modelTerms: { commercialUse: true, version: 'in-repo', checkedOn: '2026-09-28' },
+    modelVersion: '3',
+    modelTerms: { commercialUse: true, version: 'in-repo', checkedOn: '2026-09-30' },
   };
 }
 
@@ -381,6 +388,24 @@ function nearest(candidates: number[], target: number): number {
   return best;
 }
 
+/**
+ * How the accompaniment spaces a chord, in MIDI notes.
+ *
+ * Open, not a close triad. A third stacked straight on the root down here puts
+ * two partials about 29 Hz apart at around 110 Hz, which is the middle of the
+ * critical band at that pitch and so the point of maximum roughness — the
+ * reason this accompaniment sounded gritty however clean the notes were. Root
+ * and fifth stay low and the third goes up an octave, which is what a keyboard
+ * player does without being asked.
+ */
+export function accompanimentVoicing(chordRoot: number, root: number): number[] {
+  return [
+    root + scaleToSemitone(chordRoot),
+    root + scaleToSemitone(chordRoot + 4),
+    root + scaleToSemitone(chordRoot + 2) + 12,
+  ];
+}
+
 /** Scale degrees may run past an octave in either direction. */
 function scaleToSemitone(degree: number): number {
   const octave = Math.floor(degree / 7);
@@ -390,6 +415,51 @@ function scaleToSemitone(degree: number): number {
 
 function midiToHz(midi: number): number {
   return 440 * Math.pow(2, (midi - 69) / 12);
+}
+
+/**
+ * A two-pole bandpass, the resonance that makes a formant a formant.
+ *
+ * Version 2 scaled harmonic amplitudes by a bell curve and called that a
+ * formant. It is not one: a resonance rings, and the ringing is most of what
+ * the ear uses to hear a vowel rather than an organ stop. Filtering a source
+ * gives that for free, and gives it on the transients too, where a static
+ * amplitude table has nothing to say.
+ */
+interface Biquad {
+  b0: number;
+  b2: number;
+  a1: number;
+  a2: number;
+  x1: number;
+  x2: number;
+  y1: number;
+  y2: number;
+}
+
+function bandpass(freq: number, q: number, sampleRate: number): Biquad {
+  const w0 = (2 * Math.PI * Math.min(freq, sampleRate * 0.45)) / sampleRate;
+  const alpha = Math.sin(w0) / (2 * q);
+  const a0 = 1 + alpha;
+  return {
+    b0: alpha / a0,
+    b2: -alpha / a0,
+    a1: (-2 * Math.cos(w0)) / a0,
+    a2: (1 - alpha) / a0,
+    x1: 0,
+    x2: 0,
+    y1: 0,
+    y2: 0,
+  };
+}
+
+function biquad(f: Biquad, x: number): number {
+  const y = f.b0 * x + f.b2 * f.x2 - f.a1 * f.y1 - f.a2 * f.y2;
+  f.x2 = f.x1;
+  f.x1 = x;
+  f.y2 = f.y1;
+  f.y1 = y;
+  return y;
 }
 
 function renderVoiceNote(
@@ -413,21 +483,31 @@ function renderVoiceNote(
   // Singers arrive at a pitch rather than starting on it.
   const scoop = note.stressed ? 0.018 : 0.03;
 
+  // The source: a glottal pulse train, built from harmonics so it is band
+  // limited by construction and cannot alias. The ceiling accounts for the
+  // vibrato and the scoop, which both push a partial upward after this table
+  // is built.
+  const ceiling = sampleRate * 0.45 * 0.97;
   const amps: number[] = [];
-  for (let h = 1; h <= voice.harmonics; h++) {
-    const partial = freq * h;
-    if (partial > sampleRate * 0.45) break;
-    const rolloff = 1 / Math.pow(h, voice.brightness);
-    const shape =
-      formantGain(partial, voice.formants[0], 180) * 1.0 +
-      formantGain(partial, voice.formants[1], 260) * 0.7 +
-      formantGain(partial, voice.formants[2], 380) * 0.35 +
-      0.16;
-    amps.push(rolloff * shape);
+  const phases: number[] = [];
+  for (let h = 1; freq * h < ceiling; h++) {
+    amps.push(1 / Math.pow(h, voice.tilt));
+    // Starting every partial at zero phase stacks them into a single spike at
+    // the onset, which is heard as a click and as a hard, electronic edge on
+    // the whole note. Scattering them costs nothing and is still deterministic.
+    phases.push(rng.range(0, Math.PI * 2));
+    if (amps.length >= 48) break;
   }
   const ampSum = amps.reduce((a, b) => a + b, 0) || 1;
 
-  let breathState = 0;
+  const filters = [
+    bandpass(voice.formants[0], voice.formantQ[0], sampleRate),
+    bandpass(voice.formants[1], voice.formantQ[1], sampleRate),
+    bandpass(voice.formants[2], voice.formantQ[2], sampleRate),
+  ];
+  const formantGains = [1, 0.5, 0.22];
+
+  let aspirationState = 0;
   for (let i = 0; i < length; i++) {
     const index = start + i;
     if (index >= out.length) break;
@@ -441,23 +521,23 @@ function renderVoiceNote(
         Math.sin(2 * Math.PI * voice.vibratoHz * t + vibratoPhase) *
         Math.min(1, t / 0.25);
     const ratio = bend * vibrato;
-    let sample = 0;
+
+    let source = 0;
     for (let h = 0; h < amps.length; h++) {
-      sample += amps[h]! * Math.sin(2 * Math.PI * freq * (h + 1) * ratio * t);
+      source += amps[h]! * Math.sin(2 * Math.PI * freq * (h + 1) * ratio * t + phases[h]!);
     }
-    sample /= ampSum;
-    if (voice.breath > 0) {
-      // One pole of smoothing turns hiss into air.
-      breathState = breathState * 0.86 + (rng.next() * 2 - 1) * 0.14;
-      sample += breathState * voice.breath * env;
+    source /= ampSum;
+    if (voice.aspiration > 0) {
+      aspirationState = aspirationState * 0.86 + (rng.next() * 2 - 1) * 0.14;
+      source += aspirationState * voice.aspiration;
+    }
+
+    let sample = 0;
+    for (let f = 0; f < filters.length; f++) {
+      sample += formantGains[f]! * biquad(filters[f]!, source);
     }
     out[index] = out[index]! + sample * env * note.velocity;
   }
-}
-
-function formantGain(freq: number, centre: number, width: number): number {
-  const x = (freq - centre) / width;
-  return Math.exp(-0.5 * x * x);
 }
 
 /**
@@ -496,8 +576,7 @@ function renderAccompaniment(
   const root = voice.rootMidi - 12;
   const first = phrases[0]!;
 
-  const triadOf = (chordRoot: number): number[] =>
-    [chordRoot, chordRoot + 2, chordRoot + 4].map((d) => root + scaleToSemitone(d));
+  const triadOf = (chordRoot: number): number[] => accompanimentVoicing(chordRoot, root);
 
   if (style.accompaniment === 'drone') {
     // One chord under the whole thing: root and fifth, the way a drone works.
@@ -602,6 +681,9 @@ function reverb(input: Float32Array, sampleRate: number, mix: number): Float32Ar
     buffer: new Float32Array(Math.max(1, Math.floor(seconds * sampleRate))),
     index: 0,
     feedback: 0.76,
+    // A room absorbs treble faster than bass. An undamped comb does not, so it
+    // returns the high partials over and over and the tail turns metallic.
+    damp: 0,
   }));
   const allpassDelay = Math.max(1, Math.floor(0.005 * sampleRate));
   const allpass = new Float32Array(allpassDelay);
@@ -613,7 +695,8 @@ function reverb(input: Float32Array, sampleRate: number, mix: number): Float32Ar
     for (const comb of combs) {
       const delayed = comb.buffer[comb.index]!;
       wet += delayed;
-      comb.buffer[comb.index] = dry + delayed * comb.feedback;
+      comb.damp = comb.damp * 0.34 + delayed * 0.66;
+      comb.buffer[comb.index] = dry + comb.damp * comb.feedback;
       comb.index = (comb.index + 1) % comb.buffer.length;
     }
     wet /= combs.length;
