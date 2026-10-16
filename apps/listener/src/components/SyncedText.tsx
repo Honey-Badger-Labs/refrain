@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type { Chunk, Track } from '@refrain/catalogue';
 import { spanForLine } from '../player/alignment.js';
+import { chordsOf } from '../lib/chords.js';
 
 /**
  * The text, following the audio.
@@ -59,6 +60,14 @@ export function SyncedText({
                 span ? 'hover:bg-night-800/70' : 'cursor-default',
               ].join(' ')}
             >
+              {chordsOf(chunk.music?.chords?.[index]).length > 0 && (
+                <span
+                  className="block font-mono text-sm font-semibold tracking-wide text-amber-300"
+                  aria-label={`Chords: ${chordsOf(chunk.music?.chords?.[index]).join(', ')}`}
+                >
+                  {chordsOf(chunk.music?.chords?.[index]).join('   ')}
+                </span>
+              )}
               {line}
             </button>
           </li>

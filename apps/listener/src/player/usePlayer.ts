@@ -3,6 +3,7 @@ import type { Catalogue, Chunk, Track } from '@refrain/catalogue';
 import { pickSource } from '@refrain/catalogue';
 import { assetUrl, canPlayType } from '../lib/catalogue.js';
 import { lineAt } from './alignment.js';
+import { loopTarget } from '../lib/chords.js';
 
 export interface PlayerState {
   playing: boolean;
@@ -11,6 +12,9 @@ export interface PlayerState {
   rate: number;
   buffering: boolean;
   error: string | null;
+  /** A–B practice loop, in seconds. Null until set. */
+  loopA: number | null;
+  loopB: number | null;
 }
 
 export interface PlayerControls {
@@ -20,9 +24,12 @@ export interface PlayerControls {
   seek(seconds: number): void;
   skip(seconds: number): void;
   setRate(rate: number): void;
+  /** Mark the loop start (or end) at the playhead; a third press clears it. */
+  markLoop(): void;
+  clearLoop(): void;
 }
 
-export const RATES = [0.75, 1, 1.25, 1.5] as const;
+export const RATES = [0.5, 0.75, 1, 1.25, 1.5] as const;
 
 export interface UsePlayerOptions {
   track: Track | null;
@@ -53,7 +60,10 @@ export function usePlayer(options: UsePlayerOptions) {
     rate: 1,
     buffering: false,
     error: null,
+    loopA: null,
+    loopB: null,
   });
+  const loopRef = useRef<{ a: number | null; b: number | null }>({ a: null, b: null });
 
   // Which encoding this device can actually decode. Opus for most, AAC for
   // Safari; decided once per track rather than guessed from the user agent.
@@ -86,7 +96,12 @@ export function usePlayer(options: UsePlayerOptions) {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const sync = () =>
+    // Slowing down for practice must not drop the key. Browsers default to
+    // preserving pitch, but say so rather than rely on it.
+    audio.preservesPitch = true;
+    const sync = () => {
+      const jump = loopTarget(audio.currentTime, loopRef.current.a, loopRef.current.b);
+      if (jump !== null) audio.currentTime = jump;
       setState((s) => ({
         ...s,
         playing: !audio.paused && !audio.ended,
@@ -94,6 +109,7 @@ export function usePlayer(options: UsePlayerOptions) {
         duration: Number.isFinite(audio.duration) ? audio.duration : (track?.durationSeconds ?? 0),
         rate: audio.playbackRate,
       }));
+    };
     const onWaiting = () => setState((s) => ({ ...s, buffering: true }));
     const onPlaying = () => setState((s) => ({ ...s, buffering: false, error: null }));
     const onError = () =>
@@ -162,6 +178,19 @@ export function usePlayer(options: UsePlayerOptions) {
         const audio = audioRef.current;
         if (!audio) return;
         audio.playbackRate = rate;
+      },
+      markLoop() {
+        const audio = audioRef.current;
+        if (!audio) return;
+        const l = loopRef.current;
+        if (l.a === null) l.a = audio.currentTime;
+        else if (l.b === null && audio.currentTime > l.a) l.b = audio.currentTime;
+        else { l.a = null; l.b = null; }
+        setState((s) => ({ ...s, loopA: l.a, loopB: l.b }));
+      },
+      clearLoop() {
+        loopRef.current = { a: null, b: null };
+        setState((s) => ({ ...s, loopA: null, loopB: null }));
       },
     }),
     [],

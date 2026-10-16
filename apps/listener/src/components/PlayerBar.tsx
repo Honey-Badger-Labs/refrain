@@ -101,6 +101,21 @@ export function PlayerBar({
               </button>
             ))}
           </div>
+          <button
+            type="button"
+            onClick={() => controls.markLoop()}
+            aria-pressed={state.loopA !== null}
+            aria-label={
+              state.loopA === null
+                ? 'Set loop start here'
+                : state.loopB === null
+                  ? 'Set loop end here'
+                  : `Looping ${formatTime(state.loopA)} to ${formatTime(state.loopB)}. Press to clear`
+            }
+            className={`pill px-2 py-1 text-xs ${state.loopA !== null ? 'pill-on' : 'pill-off'}`}
+          >
+            {state.loopA === null ? 'A–B loop' : state.loopB === null ? `A ${formatTime(state.loopA)} · set B` : `⟲ ${formatTime(state.loopA)}–${formatTime(state.loopB)}`}
+          </button>
           <p aria-live="polite" className="truncate text-xs text-slate-400">
             {state.error ?? (state.buffering ? 'Buffering…' : '')}
           </p>

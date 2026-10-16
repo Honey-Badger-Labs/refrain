@@ -59,6 +59,25 @@ export const CorpusSchema = z.object({
 });
 export type Corpus = z.infer<typeof CorpusSchema>;
 
+/** A chord name: root, optional accidental, a quality the diagrams know. */
+export const CHORD_NAME = /^[A-G][b#]?(?:m|7|m7|maj7|dim|aug|sus2|sus4|6)?$/;
+export const MusicSchema = z.object({
+  key: z.string().regex(/^[A-G][b#]? (?:major|minor)$/).optional(),
+  tempoBpm: z.number().int().min(20).max(300).optional(),
+  chords: z
+    .array(
+      z
+        .string()
+        .max(200)
+        .refine((line) => line.trim() === '' || line.trim().split(/\s+/).every((c) => CHORD_NAME.test(c)), {
+          message: 'Each chord must be a name such as C, Am, G7 or F#m',
+        }),
+    )
+    .max(500)
+    .optional(),
+});
+export type Music = z.infer<typeof MusicSchema>;
+
 export const ChunkSchema = z.object({
   id,
   corpusId: id,
@@ -68,6 +87,13 @@ export const ChunkSchema = z.object({
   title: z.string().min(1).max(200),
   /** The canonical lines. Principle 1: this is the truth, audio is a render. */
   lines: z.array(z.string().min(1).max(500)).min(1),
+  /**
+   * For musicians playing along. Optional and omitted when absent, so a chunk
+   * without it serialises exactly as before and no published hash moves.
+   * `chords[i]` is the chords over `lines[i]`, space-separated; an empty
+   * string is a line with none.
+   */
+  music: MusicSchema.optional(),
 });
 export type Chunk = z.infer<typeof ChunkSchema>;
 

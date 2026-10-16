@@ -167,6 +167,8 @@ describe('PlayerBar', () => {
     rate: 1,
     buffering: false,
     error: null,
+    loopA: null,
+    loopB: null,
   };
   const controls: PlayerControls = {
     toggle: vi.fn(),
@@ -175,7 +177,22 @@ describe('PlayerBar', () => {
     seek: vi.fn(),
     skip: vi.fn(),
     setRate: vi.fn(),
+    markLoop: vi.fn(),
+    clearLoop: vi.fn(),
   };
+
+  it('offers an A–B loop and says what it is doing', async () => {
+    const { rerender } = render(
+      <PlayerBar chunk={chunk} track={makeTrack('hymn-alto')} state={state} controls={controls} subtitle="x" />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Set loop start here' }));
+    expect(controls.markLoop).toHaveBeenCalled();
+    rerender(
+      <PlayerBar chunk={chunk} track={makeTrack('hymn-alto')} state={{ ...state, loopA: 5, loopB: 9 }} controls={controls} subtitle="x" />,
+    );
+    expect(screen.getByRole('button', { name: /Looping 0:05 to 0:09/ })).toBeTruthy();
+    expect(screen.getByRole('button', { name: '0.5×' })).toBeTruthy();
+  });
 
   it('labels the control by what pressing it does', () => {
     const { rerender } = render(
