@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import type { Catalogue, ResolvedRoute } from '@refrain/catalogue';
 import { SyncedText } from '../components/SyncedText.js';
+import { ChordBox } from '../components/ChordBox.js';
+import { chordsUsed } from '../lib/chords.js';
 import { PresetPicker } from '../components/PresetPicker.js';
 import { FeedbackDialog } from '../components/FeedbackDialog.js';
 import { BackIcon, FlagIcon, ShareIcon } from '../components/Icons.js';
@@ -59,7 +61,22 @@ export function Listen({
         <p className="mt-1 text-sm text-slate-400">
           {catalogue.corpus.author} · {resolved.book.title} {resolved.chunk.number}
         </p>
+        {(resolved.chunk.music?.key || resolved.chunk.music?.tempoBpm) && (
+          <p className="mt-1 text-sm text-amber-300" data-testid="music-meta">
+            {[resolved.chunk.music.key && `Key of ${resolved.chunk.music.key}`, resolved.chunk.music.tempoBpm && `${resolved.chunk.music.tempoBpm} bpm`]
+              .filter(Boolean)
+              .join(' · ')}
+          </p>
+        )}
       </header>
+
+      {chordsUsed(resolved.chunk.music?.chords).length > 0 && (
+        <section aria-label="Ukulele chords in this piece" className="card flex flex-wrap gap-2 px-3 py-2">
+          {chordsUsed(resolved.chunk.music?.chords).map((name) => (
+            <ChordBox key={name} name={name} />
+          ))}
+        </section>
+      )}
 
       <PresetPicker
         catalogue={catalogue}
