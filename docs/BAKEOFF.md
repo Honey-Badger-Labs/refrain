@@ -140,6 +140,38 @@ $0.60 in total, of which $0.30 bought three renders that were discarded because 
 and the bytes were deleted on the way out of the failure. Both of those are fixed too: the bake-off
 refuses to start without ffmpeg, and a decode that fails keeps what it could not read.
 
+## The second look: music v2.5, 17 October 2026
+
+Three renders of the same three poems with `eleven_music_v2_5`, through the ElevenLabs connector
+rather than `refrain bakeoff`. The lyrics went in as custom lyrics, word for word, and the prompt named
+no title or poet, which Music Terms §2.1 prohibits. One take each, 225 s of audio, **3,375 credits**
+at 900 per minute. The connector estimated 5,625, so read the account balance, not the estimate.
+
+| | Sick Rose (hymn-alto) | London (hymn-tenor) | Tyger (folk-treble) |
+| --- | --- | --- | --- |
+| Words right, as sung (`medium.en`) | 34/34 | 91/94 | 137/143 |
+
+**96.7% overall** (262/271), level with music_v1's 96.9%. A new model and a lyrics field did not move the
+number. The suspect words are again plausible sung-vowel mishearings (`woe→wound`, `hearse→hers`,
+`clasp→class`), plus one that looks like a real slip (`art, Could → eye`). The audio stays local under
+`work/bakeoff/` and has not been listened to yet.
+
+### The terms, read
+
+[Music Terms](https://elevenlabs.io/music-terms), last updated 9 October 2026, Exhibit A. On Starter,
+commercial use is allowed ("All online and offline commercial use permitted, except film, TV, radio,
+and Studio Games"), with no attribution. Two rows matter more for this product than that one:
+
+- **Music Streaming Distribution:** prohibited on Starter, permitted from Creator up.
+- **Music Library Creation and Distribution:** prohibited on every self-serve plan. §4.8(f) defines a
+  Music Library as "any collection of Output … made available to third parties for those third parties
+  to use, license, download, or incorporate into their content".
+
+A public library of pre-rendered songs that listeners can download for offline play is close enough to
+both definitions that this is a question for ElevenLabs in writing, not a reading. Until then
+`modelTerms.commercialUse` stays `false`. The gate row "No provider has clean commercial terms" is
+not triggered, but it is not cleared either.
+
 ## What this does not measure
 
 **Alignment.** A music API returns audio, not line timings, so the adapter returns none and the
