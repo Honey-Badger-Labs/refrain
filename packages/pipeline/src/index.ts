@@ -26,3 +26,4 @@ export * from './render/providers.js';
 export * from './audio/decode.js';
 export * from './commands/verify.js';
 export * from './commands/status.js';
+export * from './render/elevenlabs.js';
