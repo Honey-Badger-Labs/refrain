@@ -94,9 +94,11 @@ jobs:
         env:
           REFRAIN_ASR_URL: ${{ secrets.REFRAIN_ASR_URL }}
           REFRAIN_ASR_KEY: ${{ secrets.REFRAIN_ASR_KEY }}
+          # Through the environment like every other input: see the note on the next step.
+          IN_ENVIRONMENT: ${{ inputs.environment }}
         run: |
           if [ -z "$REFRAIN_ASR_URL" ] || [ -z "$REFRAIN_ASR_KEY" ]; then
-            echo "::error::No transcriber. Set REFRAIN_ASR_URL and REFRAIN_ASR_KEY in the ${{ inputs.environment }} environment, or the run would cost money and score nothing."
+            echo "::error::No transcriber. Set REFRAIN_ASR_URL and REFRAIN_ASR_KEY in the $IN_ENVIRONMENT environment, or the run would cost money and score nothing."
             exit 1
           fi
 
