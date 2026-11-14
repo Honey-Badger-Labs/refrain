@@ -175,6 +175,7 @@ describe('the whisper API transcriber', () => {
       globalThis.fetch = realFetch;
       delete process.env.REFRAIN_ASR_URL;
       delete process.env.REFRAIN_ASR_KEY;
+      delete process.env.REFRAIN_ASR_PROVIDER;
     }
   };
 
@@ -259,6 +260,7 @@ describe('why a transcriber cannot run', () => {
     delete process.env.REFRAIN_ASR_URL;
     delete process.env.REFRAIN_ASR_KEY;
     delete process.env.REFRAIN_ASR_MODEL;
+    delete process.env.REFRAIN_ASR_PROVIDER;
   });
 
   const asr = (status: number) => {
@@ -322,6 +324,7 @@ describe('an absent model name', () => {
     delete process.env.REFRAIN_ASR_URL;
     delete process.env.REFRAIN_ASR_KEY;
     delete process.env.REFRAIN_ASR_MODEL;
+    delete process.env.REFRAIN_ASR_PROVIDER;
   });
 
   const capture = () => {
@@ -354,5 +357,164 @@ describe('an absent model name', () => {
     globalThis.fetch = (async () =>
       new Response('{"error":{"message":"model `` does not exist"}}', { status: 400 })) as typeof fetch;
     expect(await whisperApiTranscriber.why?.()).toMatch(/does not exist/);
+  });
+});
+
+/**
+ * xAI Grok STT is not OpenAI-compatible.
+ *
+ * It replies with JSON `{ text, ... }`, it does not accept `prompt` or
+ * `response_format`, and it wants `file` last in the multipart body. The
+ * same adapter still has to read a plain-text Whisper reply, so the parser
+ * looks at the body rather than at which host was asked.
+ */
+describe('the Grok (xAI) speech-to-text listener', () => {
+  const realFetch = globalThis.fetch;
+  const takeDir = () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'refrain-take-'));
+    const take = path.join(dir, 'take.wav');
+    fs.writeFileSync(take, 'audio');
+    return { dir, take };
+  };
+
+  afterEach(() => {
+    globalThis.fetch = realFetch;
+    delete process.env.REFRAIN_ASR_URL;
+    delete process.env.REFRAIN_ASR_KEY;
+    delete process.env.REFRAIN_ASR_MODEL;
+    delete process.env.REFRAIN_ASR_PROVIDER;
+  });
+
+  const mockFetch = (reply: (init?: { body?: FormData }) => Response) => {
+    globalThis.fetch = (async (_url: unknown, init?: { body?: FormData }) =>
+      reply(init)) as unknown as typeof fetch;
+  };
+
+  it('reads the text field from a JSON reply', async () => {
+    const { dir, take } = takeDir();
+    process.env.REFRAIN_ASR_URL = 'https://api.x.ai/v1/stt';
+    process.env.REFRAIN_ASR_KEY = 'k';
+    mockFetch(
+      () =>
+        new Response(JSON.stringify({ text: '  Tyger Tyger  ', language: 'en', duration: 1.2 }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
+    );
+    try {
+      expect(await whisperApiTranscriber.transcribe(take)).toBe('Tyger Tyger');
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('still reads a plain-text Whisper reply', async () => {
+    const { dir, take } = takeDir();
+    process.env.REFRAIN_ASR_URL = 'https://api.openai.com/v1/audio/transcriptions';
+    process.env.REFRAIN_ASR_KEY = 'k';
+    mockFetch(() => new Response('  Tyger Tyger  ', { status: 200, headers: { 'content-type': 'text/plain' } }));
+    try {
+      expect(await whisperApiTranscriber.transcribe(take)).toBe('Tyger Tyger');
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('reads JSON even when the content-type is missing, if the body has a text field', async () => {
+    const { dir, take } = takeDir();
+    process.env.REFRAIN_ASR_URL = 'https://api.x.ai/v1/stt';
+    process.env.REFRAIN_ASR_KEY = 'k';
+    mockFetch(() => new Response(JSON.stringify({ text: 'London' }), { status: 200 }));
+    try {
+      expect(await whisperApiTranscriber.transcribe(take)).toBe('London');
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('returns null when the endpoint answers with an error status', async () => {
+    const { dir, take } = takeDir();
+    process.env.REFRAIN_ASR_URL = 'https://api.x.ai/v1/stt';
+    process.env.REFRAIN_ASR_KEY = 'k';
+    mockFetch(
+      () =>
+        new Response(JSON.stringify({ error: 'nope' }), {
+          status: 500,
+          headers: { 'content-type': 'application/json' },
+        }),
+    );
+    try {
+      expect(await whisperApiTranscriber.transcribe(take)).toBeNull();
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('sends only the fields xAI accepts, with file last, and defaults the model', async () => {
+    const { dir, take } = takeDir();
+    process.env.REFRAIN_ASR_URL = 'https://api.x.ai/v1/stt';
+    process.env.REFRAIN_ASR_KEY = 'k';
+    process.env.REFRAIN_ASR_MODEL = '';
+    let keys: string[] = [];
+    let model: string | null = null;
+    mockFetch((init) => {
+      const form = init?.body as FormData;
+      keys = [...form.keys()];
+      model = String(form.get('model'));
+      return new Response(JSON.stringify({ text: 'ok' }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    });
+    try {
+      await whisperApiTranscriber.transcribe(take);
+      expect(keys).toEqual(['model', 'file']);
+      expect(model).toBe('grok-voice-transcribe-2.0');
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('honours REFRAIN_ASR_PROVIDER=xai even when the URL is not on api.x.ai', async () => {
+    const { dir, take } = takeDir();
+    process.env.REFRAIN_ASR_URL = 'https://asr.example/v1/stt';
+    process.env.REFRAIN_ASR_KEY = 'k';
+    process.env.REFRAIN_ASR_PROVIDER = 'xai';
+    let keys: string[] = [];
+    mockFetch((init) => {
+      keys = [...(init?.body as FormData).keys()];
+      return new Response(JSON.stringify({ text: 'ok' }), { status: 200 });
+    });
+    try {
+      await whisperApiTranscriber.transcribe(take);
+      expect(keys).toEqual(['model', 'file']);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('keeps sending prompt and response_format to an OpenAI-compatible host', async () => {
+    const { dir, take } = takeDir();
+    process.env.REFRAIN_ASR_URL = 'https://api.openai.com/v1/audio/transcriptions';
+    process.env.REFRAIN_ASR_KEY = 'k';
+    let keys: string[] = [];
+    let prompt: FormDataEntryValue | null = null;
+    let format: FormDataEntryValue | null = null;
+    mockFetch((init) => {
+      const form = init?.body as FormData;
+      keys = [...form.keys()];
+      prompt = form.get('prompt');
+      format = form.get('response_format');
+      return new Response('ok', { status: 200 });
+    });
+    try {
+      await whisperApiTranscriber.transcribe(take);
+      expect(keys).toContain('prompt');
+      expect(keys).toContain('response_format');
+      expect(format).toBe('text');
+      expect(String(prompt)).toMatch(/sung performance/i);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
   });
 });
