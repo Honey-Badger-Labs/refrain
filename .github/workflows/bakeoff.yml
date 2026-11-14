@@ -37,9 +37,6 @@ on:
         description: 'Upload the renders too. THIS REPOSITORY IS PUBLIC — see the note in the workflow'
         type: boolean
         default: false
-      environment:
-        description: 'Which environment holds the API keys'
-        default: 'github-pages'
 
 permissions:
   contents: read
@@ -53,12 +50,10 @@ jobs:
   bakeoff:
     runs-on: ubuntu-latest
 
-    # Where ELEVENLABS_API_KEY lives. Referencing an environment is how a job
-    # is handed its secrets, and it also records a deployment against it — so
-    # an extra entry will appear under the github-pages environment that did
-    # not deploy the site. Harmless, but if it bothers you, make a `bakeoff`
-    # environment, put the key there, and pass its name above.
-    environment: ${{ inputs.environment }}
+    # Keys live in the `bakeoff` environment (not github-pages). The name is
+    # hard-coded so a dispatcher cannot point this billable job at another
+    # environment or inject the environment name into the shell.
+    environment: bakeoff
 
     steps:
       - name: Refuse a run that was not confirmed
@@ -96,7 +91,7 @@ jobs:
           REFRAIN_ASR_KEY: ${{ secrets.REFRAIN_ASR_KEY }}
         run: |
           if [ -z "$REFRAIN_ASR_URL" ] || [ -z "$REFRAIN_ASR_KEY" ]; then
-            echo "::error::No transcriber. Set REFRAIN_ASR_URL and REFRAIN_ASR_KEY in the ${{ inputs.environment }} environment, or the run would cost money and score nothing."
+            echo "::error::No transcriber. Set REFRAIN_ASR_URL and REFRAIN_ASR_KEY in the bakeoff environment, or the run would cost money and score nothing."
             exit 1
           fi
 
