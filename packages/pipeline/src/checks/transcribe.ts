@@ -215,12 +215,13 @@ export const whisperCliTranscriber: Transcriber = {
 };
 
 /**
- * An OpenAI-compatible speech-to-text endpoint.
+ * A hosted speech-to-text endpoint.
  *
  * Installing whisper locally is the better answer for a long run, but a
  * bake-off is three chunks and an afternoon, and the point is to get the
- * accuracy number today rather than after a CUDA install. Configured with two
- * environment variables so it works against any compatible host.
+ * accuracy number today rather than after a CUDA install. Talks to an
+ * OpenAI-compatible host (OpenAI, Groq) or to xAI Grok STT, chosen by
+ * REFRAIN_ASR_PROVIDER or inferred from the URL host.
  */
 export const whisperApiTranscriber: Transcriber = {
   name: 'whisper-api',
@@ -243,7 +244,7 @@ export const whisperApiTranscriber: Transcriber = {
   async transcribe(audioPath: string) {
     const response = await askAsr(audioPath);
     if (!response || !response.ok) return null;
-    return (await response.text()).trim() || null;
+    return readTranscript(response);
   },
   async why() {
     if (!process.env.REFRAIN_ASR_KEY || !process.env.REFRAIN_ASR_URL) return null;
@@ -253,12 +254,17 @@ export const whisperApiTranscriber: Transcriber = {
         return 'REFRAIN_ASR_URL and REFRAIN_ASR_KEY are set, but the host could not be reached';
       }
       if (response.ok) return null;
-      const model = process.env.REFRAIN_ASR_MODEL || 'whisper-1';
+      const provider = asrProvider(process.env.REFRAIN_ASR_URL as string);
+      const model = asrModel(provider);
       // A wrong model name is the usual cause and the least obvious: the
       // default suits OpenAI and is rejected by every other host.
+      const hostHint =
+        provider === 'xai'
+          ? 'xAI wants grok-voice-transcribe-2.0'
+          : 'Groq wants whisper-large-v3';
       const hint =
         response.status === 400 || response.status === 404
-          ? ` The model asked for was "${model}" — set REFRAIN_ASR_MODEL to one this host serves (Groq wants whisper-large-v3)`
+          ? ` The model asked for was "${model}" — set REFRAIN_ASR_MODEL to one this host serves (${hostHint})`
           : response.status === 401 || response.status === 403
             ? ' The key was refused'
             : '';
@@ -279,22 +285,77 @@ export const whisperApiTranscriber: Transcriber = {
   },
 };
 
+type AsrProvider = 'openai' | 'xai';
+
+/**
+ * Which request shape to send.
+ *
+ * xAI's STT endpoint is not OpenAI-compatible: it rejects `prompt` and
+ * `response_format`, wants `file` last, and replies with JSON. The default
+ * stays OpenAI unless the URL host is api.x.ai or REFRAIN_ASR_PROVIDER=xai.
+ */
+function asrProvider(url: string): AsrProvider {
+  const explicit = (process.env.REFRAIN_ASR_PROVIDER || '').trim().toLowerCase();
+  if (explicit === 'xai' || explicit === 'openai') return explicit;
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    if (host === 'api.x.ai' || host.endsWith('.x.ai')) return 'xai';
+  } catch {
+    /* a bad URL still goes to fetch, which returns null if it cannot run */
+  }
+  return 'openai';
+}
+
+function asrModel(provider: AsrProvider): string {
+  // `||`, not `??`: a CI runner sets an absent secret to the empty string
+  // rather than leaving it unset, and an empty model name draws a 400 that
+  // looks exactly like a wrong one. This cost a workflow run.
+  return process.env.REFRAIN_ASR_MODEL || (provider === 'xai' ? 'grok-voice-transcribe-2.0' : 'whisper-1');
+}
+
+/**
+ * OpenAI with response_format=text replies in plain text. xAI replies with
+ * JSON `{ text, language, duration, words }`. Either body, on either host,
+ * should yield the same string.
+ */
+async function readTranscript(response: Response): Promise<string | null> {
+  const body = (await response.text()).trim();
+  if (!body) return null;
+  const looksJson = /\bjson\b/i.test(response.headers.get('content-type') ?? '');
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    return looksJson ? null : body;
+  }
+  if (parsed && typeof parsed === 'object' && typeof (parsed as { text?: unknown }).text === 'string') {
+    return (parsed as { text: string }).text.trim() || null;
+  }
+  return looksJson ? null : body;
+}
+
 /** The request both of the above make. The caller decides what a reply means. */
 async function askAsr(audioPath: string): Promise<Response | null> {
   const url = process.env.REFRAIN_ASR_URL;
   const key = process.env.REFRAIN_ASR_KEY;
-  // `||`, not `??`: a CI runner sets an absent secret to the empty string
-  // rather than leaving it unset, and an empty model name draws a 400 that
-  // looks exactly like a wrong one. This cost a workflow run.
-  const model = process.env.REFRAIN_ASR_MODEL || 'whisper-1';
   if (!url || !key) return null;
 
+  const provider = asrProvider(url);
+  const model = asrModel(provider);
   const form = new FormData();
-  form.append('file', new Blob([fs.readFileSync(audioPath)]), path.basename(audioPath));
-  form.append('model', model);
-  form.append('response_format', 'text');
-  // Sung words are not conversational speech; saying so measurably helps.
-  form.append('prompt', 'A sung performance of a poem. Transcribe the words exactly.');
+  const file = new Blob([fs.readFileSync(audioPath)]);
+  const filename = path.basename(audioPath);
+  if (provider === 'xai') {
+    // Option fields must precede `file`; fields after it may be ignored.
+    form.append('model', model);
+    form.append('file', file, filename);
+  } else {
+    form.append('file', file, filename);
+    form.append('model', model);
+    form.append('response_format', 'text');
+    // Sung words are not conversational speech; saying so measurably helps.
+    form.append('prompt', 'A sung performance of a poem. Transcribe the words exactly.');
+  }
 
   try {
     return await fetch(url, {

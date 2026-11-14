@@ -104,6 +104,7 @@ jobs:
           REFRAIN_ASR_URL: ${{ secrets.REFRAIN_ASR_URL }}
           REFRAIN_ASR_KEY: ${{ secrets.REFRAIN_ASR_KEY }}
           REFRAIN_ASR_MODEL: ${{ secrets.REFRAIN_ASR_MODEL }}
+          REFRAIN_ASR_PROVIDER: ${{ secrets.REFRAIN_ASR_PROVIDER }}
           IN_BUDGET: ${{ inputs.budget }}
           IN_RUNS: ${{ inputs.runs }}
           IN_PROVIDERS: ${{ inputs.providers }}

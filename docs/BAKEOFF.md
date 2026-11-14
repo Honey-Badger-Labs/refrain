@@ -46,8 +46,15 @@ partnership, so read the current version rather than a summary.
 
 ```bash
 export ELEVENLABS_API_KEY=...
+# OpenAI Whisper (default request shape):
 export REFRAIN_ASR_URL=https://api.openai.com/v1/audio/transcriptions
 export REFRAIN_ASR_KEY=...
+# Or xAI Grok STT — the provider is inferred from the URL host, so
+# REFRAIN_ASR_PROVIDER=xai is optional. The model defaults to
+# grok-voice-transcribe-2.0 when the host is api.x.ai:
+#   export REFRAIN_ASR_URL=https://api.x.ai/v1/stt
+#   export REFRAIN_ASR_MODEL=grok-voice-transcribe-2.0
+#   export REFRAIN_ASR_KEY=...   # an xAI API key with speech-to-text access only
 ```
 
 Without an ASR endpoint (or a local `whisper-cli`), the run produces audio and **no accuracy
